@@ -207,45 +207,6 @@
   .bar-track   { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
   .bar-fill    { height: 100%; border-radius: 3px; transition: width .5s ease; }
 
-  /* ── ROUTE MAP ── */
-  .route-map {
-    padding: 20px 24px;
-    display: flex; align-items: center;
-  }
-  .route-site {
-    display: flex; flex-direction: column; align-items: center; gap: 7px;
-    flex-shrink: 0; width: 90px;
-  }
-  .route-circle {
-    width: 60px; height: 60px; border-radius: 50%;
-    border: 3px solid;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 700;
-    transition: border-color .4s, color .4s, background .4s;
-  }
-  .route-site-name {
-    font-size: 10px; font-weight: 600; color: var(--text);
-    text-align: center; line-height: 1.3;
-  }
-  .route-site-sub {
-    font-size: 9px; color: var(--muted); font-weight: 400;
-    text-align: center; line-height: 1.3;
-  }
-  .route-connector {
-    flex: 1; display: flex; flex-direction: column;
-    align-items: center; gap: 5px; min-width: 70px;
-  }
-  .route-badge {
-    font-size: 10px; font-weight: 700;
-    padding: 2px 9px; border-radius: 10px;
-    border: 1px solid; white-space: nowrap;
-    transition: all .4s;
-  }
-  .route-line {
-    width: 100%; height: 4px; border-radius: 2px;
-    transition: background .4s;
-  }
-
   /* ── CHART ── */
   .chart-panel { margin-top: 2px; }
   .chart-wrap  {
@@ -280,9 +241,10 @@
   </div>
   <div class="nav-sep"></div>
   <div class="venue-switcher">
-    <button class="venue-btn active" data-venue="Stade LSS"                onclick="switchVenue(this)">Stade LSS</button>
-    <button class="venue-btn"        data-venue="Gare BRT · Dakar Dem Dikk" onclick="switchVenue(this)">Gare BRT · Dakar Dem Dikk</button>
-    <button class="venue-btn"        data-venue="Gare TER · Dakar-AIBD"     onclick="switchVenue(this)">Gare TER · Dakar-AIBD</button>
+    <button class="venue-btn active" data-venue="Stade LSS"             onclick="switchVenue(this)">Stade LSS</button>
+    <button class="venue-btn"        data-venue="Gare Obélisque (BRT)"  onclick="switchVenue(this)">Gare Obélisque (BRT)</button>
+    <button class="venue-btn"        data-venue="Gare Colobane (TER)"   onclick="switchVenue(this)">Gare Colobane (TER)</button>
+    <button class="venue-btn"        data-venue="Stade Abdoulaye Wade"  onclick="switchVenue(this)">Stade Abdoulaye Wade</button>
   </div>
   <div class="nav-right">
     <button class="btn" id="refreshBtn" onclick="doRefresh()">🔄 Actualiser</button>
@@ -354,17 +316,6 @@
 
   </div>
 
-  <!-- ROUTE MAP -->
-  <div class="panel">
-    <div class="panel-head">
-      <span>🔗 Connectivité des sites — Route JOJ</span>
-      <span id="route-update" style="font-size:10px;font-weight:400">—</span>
-    </div>
-    <div class="route-map" id="routeMap">
-      <div style="color:var(--muted);font-size:12px;padding:8px">Chargement…</div>
-    </div>
-  </div>
-
   <!-- CHART -->
   <div class="panel chart-panel">
     <div class="panel-head">
@@ -390,7 +341,6 @@
 
   let liveTimer    = null;
   let currentVenue = 'Stade LSS';
-  let lastAllData  = {};
   const densityHistory = [];   // { avg, time } — max 8 entries
 
   // ── Clock ──────────────────────────────────────────────────────────
@@ -424,10 +374,7 @@
 
   // ── Shared refresh+load ────────────────────────────────────────────
   async function fetchAndRefresh() {
-    const res = await fetch('/api/refresh');
-    const allData = await res.json();
-    lastAllData = allData;
-    updateRouteMap(allData);
+    await fetch('/api/refresh');
     await loadVenue();
   }
 
@@ -686,77 +633,6 @@
       ctx.fillStyle = '#ECF4F8'; ctx.font = '9px Segoe UI';
       ctx.fillText(p.avg + '%', x, y - 8);
     });
-  }
-
-  // ── Route map ─────────────────────────────────────────────────────
-  const ROUTE_SITES = [
-    'Stade LSS',
-    'Gare BRT · Dakar Dem Dikk',
-    'Gare TER · Dakar-AIBD'
-  ];
-
-  function routeColor(avg) {
-    return avg >= 85 ? '#FF3D3D' : avg >= 60 ? '#FFBA00' : '#00F0A0';
-  }
-  function routeBg(avg) {
-    if (avg >= 85) return 'rgba(255,61,61,.1)';
-    if (avg >= 60) return 'rgba(255,186,0,.08)';
-    return 'rgba(0,240,160,.06)';
-  }
-  function connBadgeBg(avg) {
-    if (avg >= 85) return 'rgba(255,61,61,.18)';
-    if (avg >= 60) return 'rgba(255,186,0,.14)';
-    return 'rgba(0,240,160,.1)';
-  }
-
-  function updateRouteMap(allData) {
-    const avgs = {};
-    for (const [lieu, zones] of Object.entries(allData)) {
-      if (zones && zones.length) {
-        avgs[lieu] = Math.round(zones.reduce((s,z) => s + z.densite, 0) / zones.length);
-      }
-    }
-
-    const container = document.getElementById('routeMap');
-    let html = '';
-
-    ROUTE_SITES.forEach((site, i) => {
-      const avg = avgs[site] ?? 0;
-      const c   = routeColor(avg);
-      const bg  = routeBg(avg);
-      const parts = site.split(' · ');
-
-      html += `
-        <div class="route-site">
-          <div class="route-circle" style="border-color:${c};background:${bg};color:${c}">
-            ${avg > 0 ? avg + '%' : '—'}
-          </div>
-          <div class="route-site-name">${parts[0]}</div>
-          ${parts[1] ? `<div class="route-site-sub">${parts[1]}</div>` : ''}
-        </div>`;
-
-      if (i < ROUTE_SITES.length - 1) {
-        const nextSite = ROUTE_SITES[i + 1];
-        const nextAvg  = avgs[nextSite] ?? 0;
-        const connAvg  = avg > 0 && nextAvg > 0 ? Math.round((avg + nextAvg) / 2) : 0;
-        const cc  = routeColor(connAvg);
-        const cbg = connBadgeBg(connAvg);
-
-        html += `
-          <div class="route-connector">
-            <div class="route-badge" style="color:${cc};border-color:${cc};background:${cbg}">
-              ~${connAvg}% moy.
-            </div>
-            <div class="route-line" style="background:${cc}"></div>
-          </div>`;
-      }
-    });
-
-    container.innerHTML = html;
-
-    const now = new Date().toLocaleTimeString('fr-FR', { hour12: false });
-    const el = document.getElementById('route-update');
-    if (el) el.textContent = 'MAJ ' + now;
   }
 
   // Boot

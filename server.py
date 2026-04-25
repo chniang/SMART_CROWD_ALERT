@@ -15,32 +15,41 @@ df_base = pd.read_csv("data/joj_crowd_data.csv")
 
 LIEUX = {
     "Stade LSS": [
-        {"zone": "Tribune Nord",      "capacite": 15000},
-        {"zone": "Tribune Sud",       "capacite": 15000},
-        {"zone": "Tribune Est",       "capacite": 5000},
-        {"zone": "Tribune Ouest",     "capacite": 8000},
-        {"zone": "Entrée Principale", "capacite": 6000},
-        {"zone": "Entrée Secondaire", "capacite": 3000},
-        {"zone": "Fan Zone",          "capacite": 4000},
+        {"zone": "Tribune Nord",       "capacite": 15000},
+        {"zone": "Tribune Sud",        "capacite": 15000},
+        {"zone": "Tribune Est",        "capacite": 5000},
+        {"zone": "Tribune Ouest",      "capacite": 8000},
+        {"zone": "Entrée Principale",  "capacite": 6000},
+        {"zone": "Entrée Secondaire",  "capacite": 3000},
+        {"zone": "Fan Zone",           "capacite": 4000},
     ],
-    "Gare BRT · Dakar Dem Dikk": [
-        {"zone": "Quai Départ Nord",  "capacite": 2000},
-        {"zone": "Quai Départ Sud",   "capacite": 2000},
-        {"zone": "Hall Principal",    "capacite": 3000},
-        {"zone": "Zone Billetterie",  "capacite": 1500},
-        {"zone": "Sortie Est",        "capacite": 1000},
-        {"zone": "Sortie Ouest",      "capacite": 1000},
-        {"zone": "Parking Relais",    "capacite": 500},
+    "Gare Obélisque (BRT)": [
+        {"zone": "Porte A — Nord",     "capacite": 1200},
+        {"zone": "Porte B — Centre",   "capacite": 1200},
+        {"zone": "Porte C — Sud",      "capacite": 1200},
+        {"zone": "Quai Départ",        "capacite": 2000},
+        {"zone": "Quai Arrivée",       "capacite": 2000},
+        {"zone": "Hall Principal",     "capacite": 3000},
+        {"zone": "Zone Billetterie",   "capacite": 800},
     ],
-    "Gare TER · Dakar-AIBD": [
-        {"zone": "Quai 1",            "capacite": 1500},
-        {"zone": "Quai 2",            "capacite": 1500},
-        {"zone": "Hall Accueil",      "capacite": 2500},
-        {"zone": "Zone Contrôle",     "capacite": 1000},
-        {"zone": "Sortie Principale", "capacite": 800},
-        {"zone": "Parking TER",       "capacite": 600},
-        {"zone": "Zone Attente",      "capacite": 700},
-    ]
+    "Gare Colobane (TER)": [
+        {"zone": "Quai 1 — Dakar",     "capacite": 1500},
+        {"zone": "Quai 2 — Diamniadio","capacite": 1500},
+        {"zone": "Hall Accueil",       "capacite": 2500},
+        {"zone": "Zone Contrôle",      "capacite": 1000},
+        {"zone": "Sortie Principale",  "capacite": 800},
+        {"zone": "Sortie Secondaire",  "capacite": 500},
+        {"zone": "Zone Attente",       "capacite": 700},
+    ],
+    "Stade Abdoulaye Wade": [
+        {"zone": "Tribune Nord",       "capacite": 10000},
+        {"zone": "Tribune Sud",        "capacite": 10000},
+        {"zone": "Tribune Est",        "capacite": 4000},
+        {"zone": "Tribune Ouest",      "capacite": 4000},
+        {"zone": "Entrée Principale",  "capacite": 5000},
+        {"zone": "Entrée Secondaire",  "capacite": 2500},
+        {"zone": "Zone VIP",           "capacite": 1000},
+    ],
 }
 
 @app.route('/')
@@ -196,15 +205,6 @@ def get_lieu():
         return jsonify(zones)
     except Exception:
         return jsonify([])
-
-@app.route('/api/all')
-def get_all():
-    try:
-        with open("data.json", "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return jsonify(data)
-    except Exception:
-        return jsonify({})
 
 import os as _os
 if not _os.path.exists("data.json"):
