@@ -22,6 +22,7 @@ LIEUX = {
         {"zone": "Entrée Principale", "capacite": 5000},
         {"zone": "Entrée Secondaire", "capacite": 2500},
         {"zone": "Zone VIP",          "capacite": 1000},
+        {"zone": "Parking",           "capacite": 3000},
     ],
     "Dakar Arena": [
         {"zone": "Secteur A",         "capacite": 4000},
@@ -31,6 +32,7 @@ LIEUX = {
         {"zone": "Entrée Principale", "capacite": 3000},
         {"zone": "Entrée Secondaire", "capacite": 2000},
         {"zone": "Zone Médias",       "capacite": 500},
+        {"zone": "Parking",           "capacite": 2000},
     ],
     "Stade Iba Mar Diop": [
         {"zone": "Tribune Nord",      "capacite": 6000},
@@ -40,6 +42,7 @@ LIEUX = {
         {"zone": "Entrée Principale", "capacite": 3000},
         {"zone": "Entrée Secondaire", "capacite": 1500},
         {"zone": "Fan Zone",          "capacite": 2000},
+        {"zone": "Parking",           "capacite": 1500},
     ],
     "Corniche Ouest": [
         {"zone": "Zone Plage Nord",   "capacite": 5000},
@@ -67,6 +70,7 @@ LIEUX = {
         {"zone": "Entrée Sud",        "capacite": 2000},
         {"zone": "Zone VIP",          "capacite": 500},
         {"zone": "Zone Médias",       "capacite": 300},
+        {"zone": "Parking",           "capacite": 1000},
     ],
     "Gare Obélisque (BRT)": [
         {"zone": "Porte A — Nord",    "capacite": 1200},
@@ -76,6 +80,7 @@ LIEUX = {
         {"zone": "Quai Arrivée",      "capacite": 2000},
         {"zone": "Hall Principal",    "capacite": 3000},
         {"zone": "Zone Billetterie",  "capacite": 800},
+        {"zone": "Parking Relais",    "capacite": 800},
     ],
     "Gare Colobane (TER)": [
         {"zone": "Quai 1 — Dakar",      "capacite": 1500},
@@ -85,8 +90,28 @@ LIEUX = {
         {"zone": "Sortie Principale",   "capacite": 800},
         {"zone": "Sortie Secondaire",   "capacite": 500},
         {"zone": "Zone Attente",        "capacite": 700},
+        {"zone": "Parking TER",         "capacite": 600},
     ],
 }
+
+SCENARIO = "normal"
+
+def get_heure_factor(heure):
+    factors = {7: 0.3, 8: 0.3, 9: 0.7, 10: 0.7, 11: 0.65,
+               12: 0.55, 13: 0.55, 14: 0.8, 15: 0.8, 16: 0.75,
+               17: 0.7, 18: 0.9, 19: 0.9, 20: 0.85}
+    return factors.get(heure, 0.4)
+
+def compute_risk_score(densite, trend, heure, zone_name):
+    score = densite
+    if trend == 'hausse_rapide': score += 15
+    elif trend == 'hausse': score += 8
+    if heure in [9,10,14,15,18,19,20]: score += 10
+    elif heure in [11,16]: score += 5
+    if 'Entrée' in zone_name or 'Porte' in zone_name: score += 10
+    elif 'Quai' in zone_name: score += 8
+    elif 'Parking' in zone_name: score += 3
+    return min(100, score)
 
 @app.route('/')
 def index():
@@ -145,6 +170,14 @@ def get_evolution():
         'statuts': statuts,
     })
 
+@app.route('/api/scenario')
+def set_scenario():
+    global SCENARIO
+    mode = request.args.get('mode', 'normal')
+    if mode in ['normal', 'montee', 'critique']:
+        SCENARIO = mode
+    return jsonify({'scenario': SCENARIO, 'status': 'ok'})
+
 @app.route('/data.json')
 def get_data_json():
     return send_from_directory('.', 'data.json')
@@ -153,7 +186,9 @@ def get_data_json():
 def refresh_data():
     import random
     from datetime import datetime
-    now = datetime.now().strftime("%H:%M:%S")
+    _now = datetime.now()
+    now  = _now.strftime("%H:%M:%S")
+    heure = _now.hour
 
     try:
         with open("data.json", "r", encoding="utf-8") as f:
@@ -172,8 +207,17 @@ def refresh_data():
     all_results = {}
     for lieu, zones in LIEUX.items():
         result = []
-        for z in zones:
-            densite = min(random.randint(20, 105), 100)
+        _critique_idx = (random.sample(range(len(zones)), min(2, len(zones)))
+                         if SCENARIO == 'critique' else [])
+        for i, z in enumerate(zones):
+            if SCENARIO == 'montee':
+                base = min(95, get_heure_factor(heure) * 100 + 15)
+                densite = int(min(100, max(5, base + random.uniform(-5, 5))))
+            elif SCENARIO == 'critique' and i in _critique_idx:
+                densite = random.randint(88, 98)
+            else:
+                base = get_heure_factor(heure) * 100
+                densite = int(min(100, max(5, base + random.uniform(-8, 8))))
             previous = prev_map.get(z["zone"], densite)
             delta = densite - previous
 
@@ -192,22 +236,19 @@ def refresh_data():
                 status = "danger"
                 if trend in ["hausse", "hausse_rapide"]:
                     risk_reason = f"Densité {densite}% + {trend_label} — risque critique"
-                    risk_score = min(100, int(densite * 1.2))
                 else:
                     risk_reason = f"Densité critique à {densite}% — intervention requise"
-                    risk_score = densite
             elif densite >= 60:
                 status = "modere"
                 if trend == "hausse_rapide":
                     risk_reason = f"Densité {densite}% avec hausse rapide — surveiller"
-                    risk_score = int(densite * 1.1)
                 else:
                     risk_reason = f"Affluence élevée à {densite}% — surveillance renforcée"
-                    risk_score = int(densite * 0.9)
             else:
                 status = "fluide"
                 risk_reason = f"Situation normale à {densite}% — flux fluide"
-                risk_score = int(densite * 0.7)
+
+            risk_score = compute_risk_score(densite, trend, heure, z["zone"])
 
             result.append({
                 "zone":        z["zone"],
@@ -224,6 +265,12 @@ def refresh_data():
                 "risk_reason": risk_reason,
                 "time":        now
             })
+        capacite_totale  = sum(zn["capacite"] for zn in zones)
+        total_affluence  = sum(r["personnes"] for r in result)
+        taux_remplissage = round(total_affluence / capacite_totale * 100, 1) if capacite_totale > 0 else 0.0
+        for r in result:
+            r["capacite_totale_site"]  = capacite_totale
+            r["taux_remplissage_site"] = taux_remplissage
         all_results[lieu] = result
 
     with open("data.json", "w", encoding="utf-8") as f:

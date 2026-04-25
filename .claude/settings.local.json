@@ -6,7 +6,16 @@
       "Read(//c/Users/Lenovo/Desktop/**)",
       "Read(//c/Users/Lenovo/**)",
       "Read(//c/Users/Lenovo/Downloads/**)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Bash(curl -s \"http://localhost:5000/api/refresh\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); site='Stade Abdoulaye Wade'; zones=d[site]; print\\(f'{site}: {len\\(zones\\)} zones'\\); [print\\(f'  {z[\\\\\"zone\\\\\"]}: cap={z[\\\\\"capacite\\\\\"]} den={z[\\\\\"densite\\\\\"]}% risk={z[\\\\\"risk_score\\\\\"]}'\\) for z in zones]; print\\(f'  cap_totale={zones[0][\\\\\"capacite_totale_site\\\\\"]} taux_site={zones[0][\\\\\"taux_remplissage_site\\\\\"]}%'\\)\")",
+      "Bash(curl -s \"http://localhost:5000/api/lieu?lieu=Gare+Ob%C3%A9lisque+%28BRT%29\")",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); [print\\(z['zone']\\) for z in d]\")",
+      "PowerShell(Stop-Process *)",
+      "Bash(python *)",
+      "Bash(curl -s \"http://localhost:5000/api/scenario?mode=critique\")",
+      "Bash(curl -s \"http://localhost:5000/api/scenario?mode=normal\")",
+      "Bash(curl -s \"http://localhost:5000/\")"
     ]
   }
 }
