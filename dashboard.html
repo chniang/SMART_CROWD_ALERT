@@ -138,7 +138,7 @@
     flex: 1;
     display: flex; flex-direction: column;
     height: 100vh; overflow-y: auto;
-    background: #F1F5F9;
+    background: #060D12;
     transition: margin-left .25s ease;
   }
 
@@ -146,18 +146,19 @@
   .topbar {
     position: sticky; top: 0; z-index: 100;
     height: 50px;
-    background: #FFFFFF;
-    border-bottom: 1px solid #E2E8F0;
+    background: rgba(6,13,18,.97);
+    border-bottom: 1px solid #182832;
     display: flex; align-items: center; gap: 12px;
     padding: 0 20px;
     flex-shrink: 0;
+    backdrop-filter: blur(8px);
   }
-  .topbar-title { font-size: 14px; font-weight: 600; color: #0F172A; }
+  .topbar-title { font-size: 14px; font-weight: 600; color: #ECF4F8; }
   .topbar-cap {
     display: none;
     padding: 3px 10px; border-radius: 5px;
     font-size: 11px; font-weight: 600;
-    background: #EFF6FF; border: 1px solid #BFDBFE; color: #1D4ED8;
+    background: #112330; border: 1px solid #182832; color: #4A7080;
   }
   .topbar-sep { flex: 1; }
   .topbar-clock {
@@ -193,19 +194,20 @@
   .content {
     padding: 14px 16px 24px;
     display: flex; flex-direction: column; gap: 12px;
+    background: #060D12;
   }
 
   /* ── KPIs ────────────────────────────────────────────────────────── */
   .kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
   .kpi {
-    background: #FFFFFF; border: 1px solid #E2E8F0;
+    background: #0D1A21; border: 1px solid #182832;
     border-radius: 10px; padding: 16px 16px 10px;
     min-height: 110px;
     display: flex; flex-direction: column; gap: 2px;
   }
-  .kpi-label { font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: .8px; }
+  .kpi-label { font-size: 10px; color: #4A7080; text-transform: uppercase; letter-spacing: .8px; }
   .kpi-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
-  .kpi-sub   { font-size: 10px; color: #94A3B8; margin-top: 1px; }
+  .kpi-sub   { font-size: 10px; color: #4A7080; margin-top: 1px; }
   .kpi-spark { display: block; width: 100%; height: 28px; margin-top: 8px; }
 
   /* ── MAIN GRID ───────────────────────────────────────────────────── */
@@ -215,16 +217,15 @@
 
   /* ── PANEL ───────────────────────────────────────────────────────── */
   .panel {
-    background: #FFFFFF; border: 1px solid #E2E8F0;
+    background: #0D1A21; border: 1px solid #182832;
     border-radius: 10px; display: flex; flex-direction: column;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06);
   }
   .panel-head {
-    padding: 9px 14px; border-bottom: 1px solid #E2E8F0;
-    font-size: 11px; font-weight: 600; color: #475569;
+    padding: 9px 14px; border-bottom: 1px solid #182832;
+    font-size: 11px; font-weight: 600; color: #4A7080;
     letter-spacing: .8px; text-transform: uppercase;
-    background: #F8FAFC;
+    background: #0D1A21;
     display: flex; align-items: center; justify-content: space-between;
     flex-shrink: 0;
   }
@@ -240,14 +241,14 @@
   }
   .zone-card:hover { transform: translateY(-2px); }
   .zone-card.danger {
-    border-color: #FCA5A5; background: #FEF2F2;
+    border-color: rgba(255,61,61,.4); background: rgba(255,61,61,.08);
     animation: zpulse 1.8s ease-in-out infinite;
   }
-  .zone-card.modere { border-color: #FCD34D; background: #FFFBEB; }
-  .zone-card.fluide { border-color: #86EFAC; background: #F0FDF4; }
+  .zone-card.modere { border-color: rgba(255,186,0,.3); background: rgba(255,186,0,.06); }
+  .zone-card.fluide { border-color: rgba(0,240,160,.25); background: rgba(0,240,160,.04); }
   @keyframes zpulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-    50%      { box-shadow: 0 0 14px 3px rgba(239,68,68,.15); }
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,61,61,0); }
+    50%      { box-shadow: 0 0 14px 3px rgba(255,61,61,.2); }
   }
   .zone-badge {
     position: absolute; top: 8px; right: 8px;
@@ -257,16 +258,16 @@
   .zone-badge.danger { background: rgba(255,61,61,.2);  color: var(--r); }
   .zone-badge.modere { background: rgba(255,186,0,.15); color: var(--y); }
   .zone-badge.fluide { background: rgba(0,240,160,.1);  color: var(--g); }
-  .zone-name   { font-size: 10px; font-weight: 700; padding-right: 44px; color: #0F172A; }
+  .zone-name   { font-size: 10px; font-weight: 700; padding-right: 44px; color: #ECF4F8; }
   .zone-pct    { font-size: 22px; font-weight: 700; line-height: 1; }
-  .zone-people { font-size: 10px; color: #64748B; }
+  .zone-people { font-size: 10px; color: #4A7080; }
   .zone-trend  { font-size: 10px; font-weight: 600; margin-top: 2px; }
-  .zone-reason { font-size: 9px; color: #94A3B8; font-style: italic; margin-top: 2px; line-height: 1.3; }
+  .zone-reason { font-size: 9px; color: #4A7080; font-style: italic; margin-top: 2px; line-height: 1.3; }
   .heatmap-legend {
     display: flex; gap: 14px; padding: 7px 12px;
-    border-top: 1px solid #E2E8F0; background: #F8FAFC;
+    border-top: 1px solid #182832; background: #0D1A21;
   }
-  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #64748B; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #4A7080; }
   .legend-dot  { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 
   /* ── DONUT ───────────────────────────────────────────────────────── */
@@ -278,7 +279,7 @@
   .donut-legend { display: flex; flex-direction: column; gap: 12px; }
   .donut-row { display: flex; align-items: center; gap: 10px; }
   .donut-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-  .donut-lbl { font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: .5px; }
+  .donut-lbl { font-size: 10px; color: #4A7080; text-transform: uppercase; letter-spacing: .5px; }
   .donut-cnt { font-size: 20px; font-weight: 700; line-height: 1; }
 
   /* ── ALERTS ──────────────────────────────────────────────────────── */
@@ -286,8 +287,8 @@
     border-radius: 7px; border-left: 3px solid;
     padding: 8px 10px; margin-bottom: 6px;
   }
-  .alert-item.danger { border-color: var(--r); background: #FEF2F2; }
-  .alert-item.modere { border-color: var(--y); background: #FFFBEB; }
+  .alert-item.danger { border-color: var(--r); background: #112330; }
+  .alert-item.modere { border-color: var(--y); background: #112330; }
   .alert-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
   .alert-badge {
     font-size: 9px; font-weight: 700; letter-spacing: .5px;
@@ -295,24 +296,24 @@
   }
   .alert-badge.danger { background: rgba(255,61,61,.18); color: var(--r); }
   .alert-badge.modere { background: rgba(255,186,0,.15); color: var(--y); }
-  .alert-time { font-size: 10px; color: #64748B; font-variant-numeric: tabular-nums; }
-  .alert-zone { font-size: 12px; font-weight: 600; color: #0F172A; }
-  .alert-msg  { font-size: 10px; color: #64748B; font-style: italic; margin-top: 2px; line-height: 1.3; }
+  .alert-time { font-size: 10px; color: #4A7080; font-variant-numeric: tabular-nums; }
+  .alert-zone { font-size: 12px; font-weight: 600; color: #ECF4F8; }
+  .alert-msg  { font-size: 10px; color: #4A7080; font-style: italic; margin-top: 2px; line-height: 1.3; }
   .alert-ok   { text-align: center; padding: 20px; color: var(--g); font-size: 13px; font-weight: 600; }
 
   /* ── BARS ────────────────────────────────────────────────────────── */
   .bar-item  { margin-bottom: 8px; }
   .bar-top   { display: flex; justify-content: space-between; margin-bottom: 3px; }
-  .bar-name  { font-size: 11px; color: #0F172A; }
+  .bar-name  { font-size: 11px; color: #ECF4F8; }
   .bar-val   { font-size: 11px; font-weight: 600; }
-  .bar-track { height: 5px; background: #E2E8F0; border-radius: 3px; overflow: hidden; }
+  .bar-track { height: 5px; background: #182832; border-radius: 3px; overflow: hidden; }
   .bar-fill  { height: 100%; border-radius: 3px; transition: width .5s ease; }
 
   /* ── FOOTER ──────────────────────────────────────────────────────── */
   .footer {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 0 2px; font-size: 10px; color: #64748B;
-    border-top: 1px solid #E2E8F0; background: #FFFFFF;
+    padding: 6px 0 2px; font-size: 10px; color: #4A7080;
+    border-top: 1px solid #182832; background: rgba(6,13,18,.97);
   }
   .footer-badge { padding: 3px 10px; border-radius: 4px; font-weight: 600; font-size: 10px; }
 
@@ -357,13 +358,13 @@
   <!-- TOPBAR -->
   <header class="topbar">
     <span class="topbar-title" id="topbarTitle">Stade Abdoulaye Wade</span>
-    <span id="siteCapBadge" style="font-size:.72rem;color:#64748B;background:#F1F5F9;border:1px solid #E2E8F0;padding:3px 10px;border-radius:12px;margin-left:12px">—</span>
+    <span id="siteCapBadge" style="font-size:.72rem;color:#4A7080;background:#112330;border:1px solid #182832;padding:3px 10px;border-radius:12px;margin-left:12px">—</span>
     <div class="topbar-sep"></div>
     <div class="offline-badge" id="offlineBadge"></div>
     <div style="display:flex;gap:6px">
-      <button onclick="setScenario('normal')"   id="sc-normal"   style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid #E2E8F0;background:#F8FAFC;color:#64748B;cursor:pointer;font-family:inherit;font-weight:700">Normal</button>
-      <button onclick="setScenario('montee')"   id="sc-montee"   style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid #FCD34D;background:#FFFBEB;color:#92400E;cursor:pointer;font-family:inherit">Montée</button>
-      <button onclick="setScenario('critique')" id="sc-critique" style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid #FCA5A5;background:#FEF2F2;color:#991B1B;cursor:pointer;font-family:inherit">Critique</button>
+      <button onclick="setScenario('normal')"   id="sc-normal"   style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid #182832;background:#0D1A21;color:#4A7080;cursor:pointer;font-family:inherit;font-weight:700">Normal</button>
+      <button onclick="setScenario('montee')"   id="sc-montee"   style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,186,0,.4);background:rgba(255,186,0,.08);color:#FFBA00;cursor:pointer;font-family:inherit">Montée</button>
+      <button onclick="setScenario('critique')" id="sc-critique" style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,61,61,.4);background:rgba(255,61,61,.08);color:#FF3D3D;cursor:pointer;font-family:inherit">Critique</button>
     </div>
     <div class="topbar-clock" id="clock">--:--:--</div>
     <div class="topbar-level" id="topbarLevel">—</div>
@@ -763,14 +764,14 @@
 
     // center hole fill
     ctx.beginPath(); ctx.arc(cx, cy, ri - 1, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFFFFF'; ctx.fill();
+    ctx.fillStyle = '#0D1A21'; ctx.fill();
 
     // center text
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#0F172A';
+    ctx.fillStyle = '#ECF4F8';
     ctx.font = `bold ${Math.round(ri * 0.75)}px Segoe UI`;
     ctx.fillText(total, cx, cy - 5);
-    ctx.fillStyle = '#64748B';
+    ctx.fillStyle = '#4A7080';
     ctx.font = `${Math.round(ri * 0.42)}px Segoe UI`;
     ctx.fillText('zones', cx, cy + 13);
   }

@@ -15,7 +15,8 @@
       "Bash(python *)",
       "Bash(curl -s \"http://localhost:5000/api/scenario?mode=critique\")",
       "Bash(curl -s \"http://localhost:5000/api/scenario?mode=normal\")",
-      "Bash(curl -s \"http://localhost:5000/\")"
+      "Bash(curl -s \"http://localhost:5000/\")",
+      "Bash(curl -s http://localhost:5000/)"
     ]
   }
 }
