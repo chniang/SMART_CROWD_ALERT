@@ -201,14 +201,15 @@
   .kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
   .kpi {
     background: #0D1A21; border: 1px solid #182832;
-    border-radius: 10px; padding: 16px 16px 10px;
-    min-height: 110px;
+    border-radius: 10px; padding: 16px 16px 12px;
+    min-height: 120px;
     display: flex; flex-direction: column; gap: 2px;
   }
   .kpi-label { font-size: 10px; color: #4A7080; text-transform: uppercase; letter-spacing: .8px; }
   .kpi-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
   .kpi-sub   { font-size: 10px; color: #4A7080; margin-top: 1px; }
-  .kpi-spark { display: block; width: 100%; height: 28px; margin-top: 8px; }
+  .kpi-spark { display: block; width: 100%; height: 40px; margin-top: 10px; }
+  .kpi-trend { font-size: 9px; font-family: 'IBM Plex Mono', monospace; margin-top: 3px; font-weight: 600; }
 
   /* ── MAIN GRID ───────────────────────────────────────────────────── */
   .grid-main { display: grid; grid-template-columns: 55fr 45fr; gap: 12px; }
@@ -380,24 +381,28 @@
         <div class="kpi-value" id="kpiDanger">—</div>
         <div class="kpi-sub"  id="kpiDangerSub">— zones</div>
         <canvas class="kpi-spark" id="sparkDanger"></canvas>
+        <div class="kpi-trend" id="trendD">—</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Densité moyenne</div>
         <div class="kpi-value" id="kpiDensity">—</div>
         <div class="kpi-sub">occupation globale</div>
         <canvas class="kpi-spark" id="sparkDensity"></canvas>
+        <div class="kpi-trend" id="trendDens">—</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Total personnes</div>
         <div class="kpi-value" id="kpiPeople" style="color:var(--g)">—</div>
         <div class="kpi-sub">présentes maintenant</div>
         <canvas class="kpi-spark" id="sparkPeople"></canvas>
+        <div class="kpi-trend" id="trendP">—</div>
       </div>
       <div class="kpi">
         <div class="kpi-label">Score de risque</div>
         <div class="kpi-value" id="kpiScore">—</div>
         <div class="kpi-sub">score moyen /100</div>
         <canvas class="kpi-spark" id="sparkScore"></canvas>
+        <div class="kpi-trend" id="trendS">—</div>
       </div>
     </div>
 
@@ -665,6 +670,29 @@
     spark('sparkDensity', HIST.density, avgDensity >= 85 ? '#FF3D3D' : avgDensity >= 60 ? '#FFBA00' : '#00F0A0');
     spark('sparkPeople',  HIST.people,  '#00F0A0');
     spark('sparkScore',   HIST.score,   avgScore >= 80 ? '#FF3D3D' : avgScore >= 50 ? '#FFBA00' : '#4A7080');
+
+    const trendD    = document.getElementById('trendD');
+    trendD.textContent = trendLabel(HIST.danger,  n => n + ' zones');
+    trendD.style.color = HIST.danger[HIST.danger.length - 1] > 0 ? '#FF3D3D' : '#00F0A0';
+
+    const trendDens = document.getElementById('trendDens');
+    trendDens.textContent = trendLabel(HIST.density, n => n + '%');
+    trendDens.style.color = HIST.density[HIST.density.length - 1] >= 85 ? '#FF3D3D' : HIST.density[HIST.density.length - 1] >= 60 ? '#FFBA00' : '#00F0A0';
+
+    const trendP    = document.getElementById('trendP');
+    trendP.textContent = trendLabel(HIST.people, n => Number(n).toLocaleString('fr-FR'));
+    trendP.style.color = '#00F0A0';
+
+    const trendS    = document.getElementById('trendS');
+    trendS.textContent = trendLabel(HIST.score, n => n + ' pts');
+    trendS.style.color = HIST.score[HIST.score.length - 1] >= 80 ? '#FF3D3D' : HIST.score[HIST.score.length - 1] >= 50 ? '#FFBA00' : '#00F0A0';
+  }
+
+  function trendLabel(arr, fmt) {
+    if (arr.length < 2) return '—';
+    const diff = arr[arr.length - 1] - arr[arr.length - 2];
+    const sign = diff > 0 ? '↑ +' : diff < 0 ? '↓ ' : '→ ';
+    return sign + fmt(Math.abs(diff));
   }
 
   function spark(id, values, color) {
@@ -693,7 +721,11 @@
     ctx.beginPath();
     ctx.moveTo(px(0), py(values[0]));
     for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
-    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; ctx.stroke();
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+    const lastX = px(values.length - 1), lastY = py(values[values.length - 1]);
+    ctx.beginPath(); ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+    ctx.fillStyle = color; ctx.fill();
+    ctx.strokeStyle = '#060D12'; ctx.lineWidth = 1.5; ctx.stroke();
   }
 
   // ── Heatmap ────────────────────────────────────────────────────────
