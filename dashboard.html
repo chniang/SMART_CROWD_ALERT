@@ -15,105 +15,185 @@
     --r:      #FF3D3D;
     --text:   #ECF4F8;
     --muted:  #4A7080;
+    --sb-w:   220px;
     --grid-line: rgba(0,240,160,0.04);
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { height: 100%; }
+  html, body { height: 100%; }
   body {
-    min-height: 100%;
-    overflow-y: auto;
     font-family: 'Segoe UI', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
     font-size: 13px;
+    display: flex;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── SIDEBAR ─────────────────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sb-w);
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 200;
+  }
+  .sb-logo {
+    padding: 15px 14px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .sb-logo-text { font-size: 14px; font-weight: 700; color: var(--g); letter-spacing: .3px; }
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--g); flex-shrink: 0;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .3; transform: scale(.6); }
+  }
+  .sb-nav {
+    flex: 1; overflow-y: auto; padding: 6px 0;
+  }
+  .sb-nav::-webkit-scrollbar { width: 3px; }
+  .sb-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .sb-group {
+    padding: 8px 14px 3px;
+    font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    color: var(--muted); text-transform: uppercase;
+  }
+  .sb-site {
+    display: block; width: 100%;
+    padding: 7px 14px;
+    background: transparent;
+    border: none; border-left: 2px solid transparent;
+    color: var(--muted); font-size: 12px; font-weight: 500;
+    text-align: left; cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+  .sb-site:hover { color: var(--text); background: rgba(255,255,255,.03); }
+  .sb-site.active {
+    border-left-color: var(--g);
+    color: var(--g);
+    background: rgba(0,240,160,.06);
+    font-weight: 600;
+  }
+  .sb-bottom {
+    padding: 10px 12px; border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 6px;
+    flex-shrink: 0;
+  }
+  .sb-offline-ind {
+    display: none;
+    padding: 5px 8px;
+    background: rgba(255,61,61,.1); border: 1px solid rgba(255,61,61,.3);
+    border-radius: 6px; font-size: 10px; color: var(--r);
+    font-weight: 600; text-align: center;
+  }
+  .sb-btn {
+    padding: 7px 10px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text);
+    font-size: 12px; font-weight: 500;
+    cursor: pointer; width: 100%;
+    transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .sb-btn:hover:not(:disabled) { border-color: var(--muted); }
+  .sb-btn:disabled { opacity: .5; cursor: default; }
+  .sb-btn-live { border-color: rgba(255,61,61,.5); color: var(--r); }
+  .sb-btn-live.active { background: rgba(255,61,61,.12); }
+  .live-blink { animation: pulse 1s infinite; }
+
+  /* ── MAIN AREA ───────────────────────────────────────────────────── */
+  .main-area {
+    margin-left: var(--sb-w);
+    flex: 1;
+    display: flex; flex-direction: column;
+    height: 100vh; overflow-y: auto;
+    background: var(--bg);
     background-image:
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
-  /* ── NAVBAR ── */
-  .nav {
+  /* ── TOPBAR ──────────────────────────────────────────────────────── */
+  .topbar {
     position: sticky; top: 0; z-index: 100;
-    height: 52px;
+    height: 50px;
     background: rgba(6,13,18,.97);
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; gap: 12px;
     padding: 0 20px;
     backdrop-filter: blur(8px);
-  }
-  .nav-logo {
-    font-size: 15px; font-weight: 700; letter-spacing: .5px;
-    color: var(--g); display: flex; align-items: center; gap: 8px;
-    white-space: nowrap;
-  }
-  .pulse-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--g);
-    animation: pulse 1.4s ease-in-out infinite;
     flex-shrink: 0;
   }
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: .3; transform: scale(.6); }
-  }
-  .nav-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
-  .venue-switcher { display: flex; gap: 4px; }
-  .venue-btn {
-    padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border);
-    background: transparent; color: var(--muted); cursor: pointer;
-    font-size: 12px; font-weight: 500; transition: all .2s;
-  }
-  .venue-btn.active {
-    background: rgba(0,240,160,.12); border-color: var(--g); color: var(--g);
-  }
-  .venue-btn:hover:not(.active) { border-color: var(--muted); color: var(--text); }
-  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-  .btn {
-    padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
-    background: var(--bg2); color: var(--text); cursor: pointer;
-    font-size: 12px; font-weight: 500; transition: all .2s;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .btn:hover:not(:disabled) { border-color: var(--muted); }
-  .btn:disabled { opacity: .5; cursor: default; }
-  .btn-live { border-color: var(--r); color: var(--r); }
-  .btn-live.active { background: rgba(255,61,61,.15); }
-  .live-blink { animation: pulse 1s infinite; }
-  .nav-clock {
+  .topbar-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .topbar-sep { flex: 1; }
+  .topbar-clock {
     font-size: 13px; font-weight: 600; color: var(--g);
     font-variant-numeric: tabular-nums; letter-spacing: .5px;
-    padding: 4px 10px; background: rgba(0,240,160,.06);
-    border: 1px solid rgba(0,240,160,.15); border-radius: 6px;
+    padding: 4px 10px;
+    background: rgba(0,240,160,.06);
+    border: 1px solid rgba(0,240,160,.15);
+    border-radius: 6px;
+  }
+  .offline-badge {
+    display: none;
+    padding: 3px 10px; border-radius: 5px;
+    font-size: 10px; font-weight: 700; letter-spacing: .3px;
+    align-items: center; gap: 5px;
+  }
+  .offline-badge.show-offline {
+    display: flex;
+    background: rgba(255,61,61,.12); border: 1px solid rgba(255,61,61,.3);
+    color: var(--r);
+  }
+  .offline-badge.show-reconnected {
+    display: flex;
+    background: rgba(0,240,160,.1); border: 1px solid rgba(0,240,160,.3);
+    color: var(--g);
+  }
+  .topbar-level {
+    padding: 4px 11px; border-radius: 5px;
+    font-size: 11px; font-weight: 700; letter-spacing: .4px;
   }
 
-  /* ── PAGE WRAPPER ── */
-  .page {
-    max-width: 1400px;
-    margin: 0 auto;
+  /* ── CONTENT ─────────────────────────────────────────────────────── */
+  .content {
     padding: 14px 16px 24px;
     display: flex; flex-direction: column; gap: 12px;
   }
 
-  /* ── KPIs ── */
-  .kpis {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-  }
+  /* ── KPIs ────────────────────────────────────────────────────────── */
+  .kpis { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
   .kpi {
     background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 24px 18px; min-height: 100px;
-    display: flex; flex-direction: column; gap: 4px;
+    border-radius: 10px; padding: 16px 16px 10px;
+    min-height: 110px;
+    display: flex; flex-direction: column; gap: 2px;
   }
   .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
-  .kpi-value { font-size: 30px; font-weight: 700; line-height: 1.1; }
-  .kpi-sub   { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .kpi-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+  .kpi-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .kpi-spark { display: block; width: 100%; height: 28px; margin-top: 8px; }
 
-  /* ── MAIN GRID ── */
-  .grid-main {
-    display: grid; grid-template-columns: 60fr 40fr; gap: 12px;
-  }
+  /* ── MAIN GRID ───────────────────────────────────────────────────── */
+  .grid-main { display: grid; grid-template-columns: 55fr 45fr; gap: 12px; }
+  .left-col  { display: flex; flex-direction: column; gap: 12px; }
+  .right-col { display: flex; flex-direction: column; gap: 12px; }
 
-  /* ── PANEL ── */
+  /* ── PANEL ───────────────────────────────────────────────────────── */
   .panel {
     background: var(--bg2); border: 1px solid var(--border);
     border-radius: 10px; display: flex; flex-direction: column;
@@ -128,104 +208,91 @@
   }
   .panel-body { padding: 12px; }
 
-  /* ── HEATMAP ── */
-  .heatmap {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  }
+  /* ── HEATMAP ─────────────────────────────────────────────────────── */
+  .heatmap { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
   .zone-card {
     border-radius: 8px; border: 1px solid var(--border);
-    padding: 16px 14px; min-height: 130px;
-    display: flex; flex-direction: column; gap: 5px;
+    padding: 13px 11px; min-height: 118px;
+    display: flex; flex-direction: column; gap: 4px;
     position: relative; transition: transform .15s;
   }
   .zone-card:hover { transform: translateY(-2px); }
   .zone-card.danger {
-    border-color: rgba(255,61,61,.5);
-    background: rgba(255,61,61,.08);
+    border-color: rgba(255,61,61,.5); background: rgba(255,61,61,.08);
     animation: zpulse 1.8s ease-in-out infinite;
   }
-  .zone-card.modere {
-    border-color: rgba(255,186,0,.4);
-    background: rgba(255,186,0,.06);
-  }
-  .zone-card.fluide {
-    border-color: rgba(0,240,160,.25);
-    background: rgba(0,240,160,.04);
-  }
+  .zone-card.modere { border-color: rgba(255,186,0,.4); background: rgba(255,186,0,.06); }
+  .zone-card.fluide { border-color: rgba(0,240,160,.25); background: rgba(0,240,160,.04); }
   @keyframes zpulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(255,61,61,0); }
     50%      { box-shadow: 0 0 14px 3px rgba(255,61,61,.22); }
   }
   .zone-badge {
-    position: absolute; top: 10px; right: 10px;
-    font-size: 9px; font-weight: 700; letter-spacing: .5px;
-    padding: 2px 6px; border-radius: 4px;
+    position: absolute; top: 8px; right: 8px;
+    font-size: 9px; font-weight: 700; letter-spacing: .4px;
+    padding: 2px 5px; border-radius: 4px;
   }
   .zone-badge.danger { background: rgba(255,61,61,.2);  color: var(--r); }
   .zone-badge.modere { background: rgba(255,186,0,.15); color: var(--y); }
   .zone-badge.fluide { background: rgba(0,240,160,.1);  color: var(--g); }
-  .zone-name   { font-size: 11px; font-weight: 700; color: var(--text); padding-right: 48px; }
-  .zone-pct    { font-size: 26px; font-weight: 700; line-height: 1; }
+  .zone-name   { font-size: 10px; font-weight: 700; padding-right: 44px; }
+  .zone-pct    { font-size: 22px; font-weight: 700; line-height: 1; }
   .zone-people { font-size: 10px; color: var(--muted); }
-  .zone-trend  { font-size: 11px; font-weight: 600; margin-top: 2px; }
-  .zone-reason { font-size: 10px; color: #7a9aaa; font-style: italic; margin-top: 3px; line-height: 1.3; }
-
+  .zone-trend  { font-size: 10px; font-weight: 600; margin-top: 2px; }
+  .zone-reason { font-size: 9px; color: #7a9aaa; font-style: italic; margin-top: 2px; line-height: 1.3; }
   .heatmap-legend {
-    display: flex; gap: 16px; padding: 8px 12px;
+    display: flex; gap: 14px; padding: 7px 12px;
     border-top: 1px solid var(--border);
   }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
-  .legend-dot  { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--muted); }
+  .legend-dot  { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
 
-  /* ── RIGHT COLUMN ── */
-  .right-col { display: flex; flex-direction: column; gap: 12px; }
+  /* ── DONUT ───────────────────────────────────────────────────────── */
+  .donut-body {
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 28px;
+  }
+  #donutChart { flex-shrink: 0; width: 140px; height: 140px; display: block; }
+  .donut-legend { display: flex; flex-direction: column; gap: 12px; }
+  .donut-row { display: flex; align-items: center; gap: 10px; }
+  .donut-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .donut-lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .donut-cnt { font-size: 20px; font-weight: 700; line-height: 1; }
 
-  /* ── ALERTS ── */
+  /* ── ALERTS ──────────────────────────────────────────────────────── */
   .alert-item {
     border-radius: 7px; border-left: 3px solid;
-    padding: 9px 11px; margin-bottom: 7px; background: var(--bg3);
+    padding: 8px 10px; margin-bottom: 6px; background: var(--bg3);
   }
   .alert-item.danger { border-color: var(--r); }
   .alert-item.modere { border-color: var(--y); }
-  .alert-top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+  .alert-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
   .alert-badge {
-    font-size: 9px; font-weight: 700; letter-spacing: .6px;
+    font-size: 9px; font-weight: 700; letter-spacing: .5px;
     padding: 2px 6px; border-radius: 4px;
   }
   .alert-badge.danger { background: rgba(255,61,61,.18); color: var(--r); }
   .alert-badge.modere { background: rgba(255,186,0,.15); color: var(--y); }
-  .alert-time  { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .alert-zone  { font-size: 12px; font-weight: 600; color: var(--text); }
-  .alert-msg   { font-size: 10px; color: #7a9aaa; font-style: italic; margin-top: 2px; line-height: 1.3; }
-  .alert-ok    { text-align: center; padding: 24px; color: var(--g); font-size: 13px; font-weight: 600; }
+  .alert-time { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .alert-zone { font-size: 12px; font-weight: 600; }
+  .alert-msg  { font-size: 10px; color: #7a9aaa; font-style: italic; margin-top: 2px; line-height: 1.3; }
+  .alert-ok   { text-align: center; padding: 20px; color: var(--g); font-size: 13px; font-weight: 600; }
 
-  /* ── BARS ── */
-  .bar-item    { margin-bottom: 9px; }
-  .bar-top     { display: flex; justify-content: space-between; margin-bottom: 3px; }
-  .bar-name    { font-size: 11px; color: var(--text); }
-  .bar-val     { font-size: 11px; font-weight: 600; }
-  .bar-track   { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-  .bar-fill    { height: 100%; border-radius: 3px; transition: width .5s ease; }
+  /* ── BARS ────────────────────────────────────────────────────────── */
+  .bar-item  { margin-bottom: 8px; }
+  .bar-top   { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .bar-name  { font-size: 11px; color: var(--text); }
+  .bar-val   { font-size: 11px; font-weight: 600; }
+  .bar-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 3px; transition: width .5s ease; }
 
-  /* ── CHART ── */
-  .chart-panel { margin-top: 2px; }
-  .chart-wrap  {
-    padding: 14px 16px 10px;
-    position: relative; height: 160px;
-  }
-  #densityChart { width: 100%; height: 100%; }
-
-  /* ── FOOTER ── */
+  /* ── FOOTER ──────────────────────────────────────────────────────── */
   .footer {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 0 2px;
-    font-size: 10px; color: var(--muted);
+    padding: 6px 0 2px; font-size: 10px; color: var(--muted);
     border-top: 1px solid var(--border);
   }
-  .footer-badge {
-    padding: 3px 10px; border-radius: 4px;
-    font-weight: 600; font-size: 10px;
-  }
+  .footer-badge { padding: 3px 10px; border-radius: 4px; font-weight: 600; font-size: 10px; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinning { animation: spin .6s linear infinite; display: inline-block; }
@@ -233,131 +300,220 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="nav">
-  <div class="nav-logo">
+<!-- ── SIDEBAR ──────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sb-logo">
     <div class="pulse-dot"></div>
-    ⚡ Smart Crowd AI
-  </div>
-  <div class="nav-sep"></div>
-  <div class="venue-switcher">
-    <button class="venue-btn active" data-venue="Stade LSS"             onclick="switchVenue(this)">Stade LSS</button>
-    <button class="venue-btn"        data-venue="Gare Obélisque (BRT)"  onclick="switchVenue(this)">Gare Obélisque (BRT)</button>
-    <button class="venue-btn"        data-venue="Gare Colobane (TER)"   onclick="switchVenue(this)">Gare Colobane (TER)</button>
-    <button class="venue-btn"        data-venue="Stade Abdoulaye Wade"  onclick="switchVenue(this)">Stade Abdoulaye Wade</button>
-  </div>
-  <div class="nav-right">
-    <button class="btn" id="refreshBtn" onclick="doRefresh()">🔄 Actualiser</button>
-    <button class="btn btn-live" id="liveBtn" onclick="toggleLive()">● LIVE</button>
-    <div class="nav-clock" id="clock">--:--:--</div>
-  </div>
-</nav>
-
-<!-- PAGE -->
-<div class="page">
-
-  <!-- KPIs -->
-  <div class="kpis">
-    <div class="kpi">
-      <div class="kpi-label">Zones en danger</div>
-      <div class="kpi-value" id="kpi-danger">—</div>
-      <div class="kpi-sub" id="kpi-danger-sub">sur — zones</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Densité moyenne</div>
-      <div class="kpi-value" id="kpi-density">—</div>
-      <div class="kpi-sub">occupation globale</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Total personnes</div>
-      <div class="kpi-value" id="kpi-people" style="color:var(--g)">—</div>
-      <div class="kpi-sub">présentes maintenant</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Zones surveillées</div>
-      <div class="kpi-value" id="kpi-zones">—</div>
-      <div class="kpi-sub">capteurs actifs</div>
-    </div>
+    <div class="sb-logo-text">⚡ Smart Crowd AI</div>
   </div>
 
-  <!-- MAIN GRID -->
-  <div class="grid-main">
+  <nav class="sb-nav">
+    <div class="sb-group">Stades</div>
+    <button class="sb-site active" data-site="Stade Abdoulaye Wade"   onclick="switchSite(this)">Stade Abdoulaye Wade</button>
+    <button class="sb-site"        data-site="Dakar Arena"            onclick="switchSite(this)">Dakar Arena</button>
+    <button class="sb-site"        data-site="Stade Iba Mar Diop"     onclick="switchSite(this)">Stade Iba Mar Diop</button>
+    <button class="sb-site"        data-site="Corniche Ouest"         onclick="switchSite(this)">Corniche Ouest</button>
+    <button class="sb-site"        data-site="Complexe Tour de l'Oeuf" onclick="switchSite(this)">Complexe Tour de l'Oeuf</button>
+    <button class="sb-site"        data-site="Saly Beach West"        onclick="switchSite(this)">Saly Beach West</button>
 
-    <!-- LEFT: heatmap -->
-    <div class="panel">
-      <div class="panel-head">
-        <span>🗺 Carte thermique — <span id="venue-label">Stade LSS</span></span>
-        <span id="last-update" style="font-size:10px;font-weight:400">—</span>
+    <div class="sb-group" style="margin-top:6px">Gares</div>
+    <button class="sb-site" data-site="Gare Obélisque (BRT)" onclick="switchSite(this)">Gare Obélisque (BRT)</button>
+    <button class="sb-site" data-site="Gare Colobane (TER)"  onclick="switchSite(this)">Gare Colobane (TER)</button>
+  </nav>
+
+  <div class="sb-bottom">
+    <div class="sb-offline-ind" id="sbOffline">⚠ HORS LIGNE</div>
+    <button class="sb-btn sb-btn-live" id="liveBtn" onclick="toggleLive()">● LIVE</button>
+    <button class="sb-btn" id="refreshBtn" onclick="doRefresh()">🔄 Actualiser</button>
+  </div>
+</aside>
+
+<!-- ── MAIN AREA ─────────────────────────────────────────────────────── -->
+<div class="main-area">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <span class="topbar-title" id="topbarTitle">Stade Abdoulaye Wade</span>
+    <div class="topbar-sep"></div>
+    <div class="offline-badge" id="offlineBadge"></div>
+    <div class="topbar-clock" id="clock">--:--:--</div>
+    <div class="topbar-level" id="topbarLevel">—</div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi">
+        <div class="kpi-label">Zones en danger</div>
+        <div class="kpi-value" id="kpiDanger">—</div>
+        <div class="kpi-sub"  id="kpiDangerSub">— zones</div>
+        <canvas class="kpi-spark" id="sparkDanger"></canvas>
       </div>
-      <div class="panel-body">
-        <div class="heatmap" id="heatmap"></div>
+      <div class="kpi">
+        <div class="kpi-label">Densité moyenne</div>
+        <div class="kpi-value" id="kpiDensity">—</div>
+        <div class="kpi-sub">occupation globale</div>
+        <canvas class="kpi-spark" id="sparkDensity"></canvas>
       </div>
-      <div class="heatmap-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:var(--g)"></div>FLUIDE (&lt;60%)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--y)"></div>MODÉRÉ (60–84%)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:var(--r)"></div>DANGER (≥85%)</div>
+      <div class="kpi">
+        <div class="kpi-label">Total personnes</div>
+        <div class="kpi-value" id="kpiPeople" style="color:var(--g)">—</div>
+        <div class="kpi-sub">présentes maintenant</div>
+        <canvas class="kpi-spark" id="sparkPeople"></canvas>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Score de risque</div>
+        <div class="kpi-value" id="kpiScore">—</div>
+        <div class="kpi-sub">score moyen /100</div>
+        <canvas class="kpi-spark" id="sparkScore"></canvas>
       </div>
     </div>
 
-    <!-- RIGHT -->
-    <div class="right-col">
-      <div class="panel">
-        <div class="panel-head">
-          <span>🚨 Alertes actives</span>
-          <span id="alert-count" style="font-size:10px;font-weight:400;color:var(--r)"></span>
+    <!-- MAIN GRID -->
+    <div class="grid-main">
+
+      <!-- LEFT -->
+      <div class="left-col">
+        <div class="panel">
+          <div class="panel-head">
+            <span>🗺 Carte thermique</span>
+            <span id="lastUpdate" style="font-size:10px;font-weight:400">—</span>
+          </div>
+          <div class="panel-body">
+            <div class="heatmap" id="heatmap"></div>
+          </div>
+          <div class="heatmap-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--g)"></div>FLUIDE (&lt;60%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--y)"></div>MODÉRÉ (60–84%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--r)"></div>CRITIQUE (≥85%)</div>
+          </div>
         </div>
-        <div class="panel-body" id="alerts-body"></div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <span>🍩 Répartition des zones</span>
+            <span id="donutTotal" style="font-size:10px;font-weight:400">—</span>
+          </div>
+          <div class="donut-body">
+            <canvas id="donutChart"></canvas>
+            <div class="donut-legend">
+              <div class="donut-row">
+                <div class="donut-dot" style="background:var(--r)"></div>
+                <div>
+                  <div class="donut-lbl">Critique</div>
+                  <div class="donut-cnt" id="donutDanger" style="color:var(--r)">—</div>
+                </div>
+              </div>
+              <div class="donut-row">
+                <div class="donut-dot" style="background:var(--y)"></div>
+                <div>
+                  <div class="donut-lbl">Modéré</div>
+                  <div class="donut-cnt" id="donutModere" style="color:var(--y)">—</div>
+                </div>
+              </div>
+              <div class="donut-row">
+                <div class="donut-dot" style="background:var(--g)"></div>
+                <div>
+                  <div class="donut-lbl">Fluide</div>
+                  <div class="donut-cnt" id="donutFluide" style="color:var(--g)">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="panel">
-        <div class="panel-head">📊 Capacité par zone</div>
-        <div class="panel-body" id="bars-body"></div>
+
+      <!-- RIGHT -->
+      <div class="right-col">
+        <div class="panel">
+          <div class="panel-head">
+            <span>🚨 Alertes actives</span>
+            <span id="alertCount" style="font-size:10px;font-weight:400;color:var(--r)"></span>
+          </div>
+          <div class="panel-body" id="alertsBody"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">📊 Capacité par zone</div>
+          <div class="panel-body" id="barsBody"></div>
+        </div>
       </div>
+
+    </div><!-- /grid-main -->
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span>Smart Crowd AI · JOJ Dakar 2026 · SONATEL</span>
+      <span>Mise à jour : <span id="footerTime">—</span></span>
+      <span class="footer-badge" id="footerLevel">—</span>
     </div>
 
-  </div>
-
-  <!-- CHART -->
-  <div class="panel chart-panel">
-    <div class="panel-head">
-      <span>📈 Évolution de la densité — dernières mises à jour</span>
-      <span id="chart-range" style="font-size:10px;font-weight:400">8 dernières valeurs</span>
-    </div>
-    <div class="chart-wrap">
-      <canvas id="densityChart"></canvas>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
-  <div class="footer">
-    <span>Smart Crowd AI · JOJ Dakar 2026 · SONATEL</span>
-    <span>Dernière mise à jour : <span id="footer-time">—</span></span>
-    <span class="footer-badge" id="footer-level">—</span>
-  </div>
-
-</div><!-- /page -->
+  </div><!-- /content -->
+</div><!-- /main-area -->
 
 <script>
-  const COLOR = { danger: '#FF3D3D', modere: '#FFBA00', fluide: '#00F0A0' };
+  const C = { danger: '#FF3D3D', modere: '#FFBA00', fluide: '#00F0A0' };
 
-  let liveTimer    = null;
-  let currentVenue = 'Stade LSS';
-  const densityHistory = [];   // { avg, time } — max 8 entries
+  let currentSite = 'Stade Abdoulaye Wade';
+  let liveTimer   = null;
+  let isOffline   = false;
+  let reconnTimer = null;
+
+  const MAX_HIST = 10;
+  const HIST = { danger: [], density: [], people: [], score: [] };
+
+  // ── LocalStorage cache ─────────────────────────────────────────────
+  function saveCache(site, data) {
+    try {
+      const c = JSON.parse(localStorage.getItem('sca') || '{}');
+      c[site] = { data, time: new Date().toLocaleTimeString('fr-FR', { hour12: false }) };
+      localStorage.setItem('sca', JSON.stringify(c));
+    } catch(e) {}
+  }
+  function loadCache(site) {
+    try {
+      const c = JSON.parse(localStorage.getItem('sca') || '{}');
+      return c[site] || null;
+    } catch(e) { return null; }
+  }
+
+  // ── Offline / online ───────────────────────────────────────────────
+  function goOffline(time) {
+    isOffline = true;
+    document.getElementById('sbOffline').style.display = 'block';
+    const b = document.getElementById('offlineBadge');
+    b.className = 'offline-badge show-offline';
+    b.textContent = `⚠ HORS LIGNE — données de ${time}`;
+  }
+  function goOnline() {
+    document.getElementById('sbOffline').style.display = 'none';
+    if (isOffline) {
+      const b = document.getElementById('offlineBadge');
+      b.className = 'offline-badge show-reconnected';
+      b.textContent = '✓ RECONNECTÉ';
+      clearTimeout(reconnTimer);
+      reconnTimer = setTimeout(() => { b.className = 'offline-badge'; }, 3000);
+    }
+    isOffline = false;
+  }
 
   // ── Clock ──────────────────────────────────────────────────────────
-  function updateClock() {
+  setInterval(() => {
     document.getElementById('clock').textContent =
       new Date().toLocaleTimeString('fr-FR', { hour12: false });
-  }
-  setInterval(updateClock, 1000);
-  updateClock();
+  }, 1000);
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('fr-FR', { hour12: false });
 
-  // ── Venue switch ───────────────────────────────────────────────────
-  function switchVenue(btn) {
-    document.querySelectorAll('.venue-btn').forEach(b => b.classList.remove('active'));
+  // ── Site switch ────────────────────────────────────────────────────
+  function switchSite(btn) {
+    document.querySelectorAll('.sb-site').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    currentVenue = btn.dataset.venue;
-    document.getElementById('venue-label').textContent = currentVenue;
-    loadVenue();
+    currentSite = btn.dataset.site;
+    document.getElementById('topbarTitle').textContent = currentSite;
+    Object.keys(HIST).forEach(k => HIST[k] = []);
+    loadSite();
   }
 
   // ── Refresh button ─────────────────────────────────────────────────
@@ -365,278 +521,273 @@
     const btn = document.getElementById('refreshBtn');
     btn.innerHTML = '<span class="spinning">🔄</span> Actualiser';
     btn.disabled = true;
-    try {
-      await fetchAndRefresh();
-    } catch(e) { console.error(e); }
+    await fetchAndRefresh();
     btn.innerHTML = '🔄 Actualiser';
     btn.disabled = false;
-  }
-
-  // ── Shared refresh+load ────────────────────────────────────────────
-  async function fetchAndRefresh() {
-    await fetch('/api/refresh');
-    await loadVenue();
   }
 
   // ── Live toggle ────────────────────────────────────────────────────
   function toggleLive() {
     const btn = document.getElementById('liveBtn');
     if (liveTimer) {
-      clearInterval(liveTimer);
-      liveTimer = null;
-      btn.classList.remove('active');
-      btn.innerHTML = '● LIVE';
+      clearInterval(liveTimer); liveTimer = null;
+      btn.classList.remove('active'); btn.innerHTML = '● LIVE';
     } else {
       btn.classList.add('active');
       btn.innerHTML = '<span class="live-blink">●</span> LIVE';
-      liveTimer = setInterval(async () => {
-        try { await fetchAndRefresh(); } catch(e) {}
-      }, 5000);
+      liveTimer = setInterval(fetchAndRefresh, 5000);
     }
   }
 
-  // ── Fetch current venue data ───────────────────────────────────────
-  async function loadVenue() {
+  // ── Core: refresh all sites → display current ──────────────────────
+  async function fetchAndRefresh() {
     try {
-      const res = await fetch('/api/lieu?lieu=' + encodeURIComponent(currentVenue));
-      const data = await res.json();
-      if (data && data.length) updateUI(data);
-    } catch(e) { console.error('loadVenue error:', e); }
+      const res = await fetch('/api/refresh');
+      if (!res.ok) throw new Error();
+      const all = await res.json();
+      for (const [site, zones] of Object.entries(all)) saveCache(site, zones);
+      const data = all[currentSite];
+      if (data && data.length) { updateUI(data); goOnline(); return; }
+    } catch(e) {}
+    // fallback /api/lieu
+    try {
+      const res2 = await fetch('/api/lieu?lieu=' + encodeURIComponent(currentSite));
+      if (!res2.ok) throw new Error();
+      const data2 = await res2.json();
+      if (data2 && data2.length) { saveCache(currentSite, data2); updateUI(data2); goOnline(); return; }
+    } catch(e) {}
+    // final fallback: localStorage
+    const cached = loadCache(currentSite);
+    if (cached) { updateUI(cached.data); goOffline(cached.time); }
   }
 
-  // ── Initial boot: refresh then load ───────────────────────────────
-  async function boot() {
-    try { await fetchAndRefresh(); } catch(e) { await loadVenue(); }
+  // ── Load just current site (on site switch) ────────────────────────
+  async function loadSite() {
+    try {
+      const res = await fetch('/api/lieu?lieu=' + encodeURIComponent(currentSite));
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (data && data.length) { saveCache(currentSite, data); updateUI(data); goOnline(); return; }
+    } catch(e) {}
+    const cached = loadCache(currentSite);
+    if (cached) { updateUI(cached.data); goOffline(cached.time); }
   }
 
   function fmt(n) { return Number(n).toLocaleString('fr-FR'); }
+  function pushH(arr, v) { arr.push(v); if (arr.length > MAX_HIST) arr.shift(); }
 
-  // ── Update all UI sections ─────────────────────────────────────────
+  // ── Master update ──────────────────────────────────────────────────
   function updateUI(data) {
     updateKPIs(data);
     updateHeatmap(data);
     updateAlerts(data);
     updateBars(data);
+    updateDonut(data);
     updateFooter(data);
-    updateChart(data);
   }
 
+  // ── KPIs + sparklines ──────────────────────────────────────────────
   function updateKPIs(data) {
-    const dangers = data.filter(z => z.status === 'danger').length;
+    const dangers    = data.filter(z => z.status === 'danger').length;
     const avgDensity = Math.round(data.reduce((s,z) => s + z.densite, 0) / data.length);
     const totalPeople = data.reduce((s,z) => s + z.personnes, 0);
-    const avgScore = Math.round(data.reduce((s,z) => s + (z.risk_score || 0), 0) / data.length);
+    const avgScore   = Math.round(data.reduce((s,z) => s + (z.risk_score || 0), 0) / data.length);
 
-    const kd = document.getElementById('kpi-danger');
+    const kd = document.getElementById('kpiDanger');
     kd.textContent = dangers;
     kd.style.color = dangers > 0 ? 'var(--r)' : 'var(--g)';
+    document.getElementById('kpiDangerSub').textContent = `sur ${data.length} zones`;
 
-    const ksub = document.getElementById('kpi-danger-sub');
-    ksub.textContent = `sur ${data.length} zones · Score moy. : ${avgScore}/100`;
-
-    const kdens = document.getElementById('kpi-density');
+    const kdens = document.getElementById('kpiDensity');
     kdens.textContent = avgDensity + '%';
-    kdens.style.color = avgDensity >= 80 ? 'var(--r)' : avgDensity >= 60 ? 'var(--y)' : 'var(--g)';
+    kdens.style.color = avgDensity >= 85 ? 'var(--r)' : avgDensity >= 60 ? 'var(--y)' : 'var(--g)';
 
-    document.getElementById('kpi-people').textContent = fmt(totalPeople);
-    document.getElementById('kpi-zones').textContent  = data.length;
+    document.getElementById('kpiPeople').textContent = fmt(totalPeople);
+
+    const ks = document.getElementById('kpiScore');
+    ks.textContent = avgScore + '/100';
+    ks.style.color = avgScore >= 80 ? 'var(--r)' : avgScore >= 50 ? 'var(--y)' : 'var(--g)';
+
+    pushH(HIST.danger,  dangers);
+    pushH(HIST.density, avgDensity);
+    pushH(HIST.people,  totalPeople);
+    pushH(HIST.score,   avgScore);
+
+    spark('sparkDanger',  HIST.danger,  dangers > 0 ? '#FF3D3D' : '#00F0A0');
+    spark('sparkDensity', HIST.density, avgDensity >= 85 ? '#FF3D3D' : avgDensity >= 60 ? '#FFBA00' : '#00F0A0');
+    spark('sparkPeople',  HIST.people,  '#00F0A0');
+    spark('sparkScore',   HIST.score,   avgScore >= 80 ? '#FF3D3D' : avgScore >= 50 ? '#FFBA00' : '#4A7080');
   }
 
-  function trendColor(trend) {
-    if (trend === 'hausse_rapide') return 'var(--r)';
-    if (trend === 'hausse')        return 'var(--y)';
-    if (trend === 'baisse_rapide') return 'var(--g)';
-    if (trend === 'baisse')        return 'var(--g)';
-    return 'var(--muted)';
+  function spark(id, values, color) {
+    const cv = document.getElementById(id);
+    if (!cv || values.length < 2) return;
+    const W = cv.offsetWidth || 200;
+    const H = 28;
+    cv.width = W; cv.height = H;
+    const ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+
+    const min = Math.min(...values), max = Math.max(...values);
+    const range = max - min || 1;
+    const step  = W / (values.length - 1);
+    const px = i => i * step;
+    const py = v => H - 2 - ((v - min) / range) * (H - 4);
+
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, color + '55'); g.addColorStop(1, color + '00');
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(values[0]));
+    for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
+    ctx.lineTo(px(values.length - 1), H); ctx.lineTo(0, H);
+    ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(px(0), py(values[0]));
+    for (let i = 1; i < values.length; i++) ctx.lineTo(px(i), py(values[i]));
+    ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; ctx.stroke();
   }
 
+  // ── Heatmap ────────────────────────────────────────────────────────
+  function trendCol(t) {
+    return t === 'hausse_rapide' ? 'var(--r)' : t === 'hausse' ? 'var(--y)'
+         : (t === 'baisse' || t === 'baisse_rapide') ? 'var(--g)' : 'var(--muted)';
+  }
   function updateHeatmap(data) {
-    const hm = document.getElementById('heatmap');
-    hm.innerHTML = data.map(z => {
-      const c    = COLOR[z.status];
-      const badge = z.status === 'danger' ? '⚠ DANGER' : z.status === 'modere' ? '~ MOD.' : '✓ OK';
-      const tc   = trendColor(z.trend);
+    document.getElementById('heatmap').innerHTML = data.map(z => {
+      const c = C[z.status];
+      const badge = z.status === 'danger' ? '⚠ CRIT.' : z.status === 'modere' ? '~ MOD.' : '✓ OK';
       return `
         <div class="zone-card ${z.status}">
           <span class="zone-badge ${z.status}">${badge}</span>
           <div class="zone-name">${z.zone}</div>
           <div class="zone-pct" style="color:${c}">${z.densite}%</div>
           <div class="zone-people">${fmt(z.personnes)} / ${fmt(z.capacite)}</div>
-          <div class="zone-trend" style="color:${tc}">${z.trend_icon || ''} ${z.trend_label || ''}</div>
+          <div class="zone-trend" style="color:${trendCol(z.trend)}">${z.trend_icon || ''} ${z.trend_label || ''}</div>
           <div class="zone-reason">${z.risk_reason || ''}</div>
         </div>`;
     }).join('');
+    document.getElementById('lastUpdate').textContent = 'MAJ ' + (data[0]?.time || '—');
   }
 
-  function updateAlerts(data) {
-    const body  = document.getElementById('alerts-body');
-    const count = document.getElementById('alert-count');
-    const alertZones = data.filter(z => z.status === 'danger' || z.status === 'modere');
+  // ── Donut chart ────────────────────────────────────────────────────
+  function updateDonut(data) {
+    const d = data.filter(z => z.status === 'danger').length;
+    const m = data.filter(z => z.status === 'modere').length;
+    const f = data.filter(z => z.status === 'fluide').length;
 
-    if (alertZones.length === 0) {
+    document.getElementById('donutDanger').textContent = d;
+    document.getElementById('donutModere').textContent = m;
+    document.getElementById('donutFluide').textContent = f;
+    document.getElementById('donutTotal').textContent  = data.length + ' zones';
+    drawDonut(d, m, f);
+  }
+
+  function drawDonut(danger, modere, fluide) {
+    const cv = document.getElementById('donutChart');
+    const S  = 140;
+    cv.width = cv.height = S;
+    const ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, S, S);
+
+    const total = danger + modere + fluide;
+    if (total === 0) return;
+
+    const cx = S / 2, cy = S / 2;
+    const ro = S * 0.42, ri = S * 0.26;
+    const segs = [
+      { v: danger, col: '#FF3D3D' },
+      { v: modere, col: '#FFBA00' },
+      { v: fluide, col: '#00F0A0' },
+    ];
+
+    let a = -Math.PI / 2;
+    segs.forEach(s => {
+      if (!s.v) return;
+      const sweep = (s.v / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, ro, a, a + sweep);
+      ctx.arc(cx, cy, ri, a + sweep, a, true);
+      ctx.closePath();
+      ctx.fillStyle = s.col;
+      ctx.fill();
+      a += sweep;
+    });
+
+    // center hole fill
+    ctx.beginPath(); ctx.arc(cx, cy, ri - 1, 0, Math.PI * 2);
+    ctx.fillStyle = '#0D1A21'; ctx.fill();
+
+    // center text
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ECF4F8';
+    ctx.font = `bold ${Math.round(ri * 0.75)}px Segoe UI`;
+    ctx.fillText(total, cx, cy - 5);
+    ctx.fillStyle = '#4A7080';
+    ctx.font = `${Math.round(ri * 0.42)}px Segoe UI`;
+    ctx.fillText('zones', cx, cy + 13);
+  }
+
+  // ── Alerts ─────────────────────────────────────────────────────────
+  function updateAlerts(data) {
+    const body  = document.getElementById('alertsBody');
+    const count = document.getElementById('alertCount');
+    const zones = data.filter(z => z.status === 'danger' || z.status === 'modere')
+                      .sort((a,b) => a.status === 'danger' ? -1 : 1);
+
+    if (!zones.length) {
       count.textContent = '';
       body.innerHTML = '<div class="alert-ok">✓ Toutes les zones sont normales</div>';
       return;
     }
-
-    count.textContent = alertZones.length + ' active' + (alertZones.length > 1 ? 's' : '');
-    alertZones.sort((a,b) => (a.status === 'danger' ? -1 : 1));
-
-    body.innerHTML = alertZones.map(z => {
-      const badge = z.status === 'danger' ? '⚠ CRITIQUE' : '◈ ATTENTION';
-      return `
-        <div class="alert-item ${z.status}">
-          <div class="alert-top">
-            <span class="alert-badge ${z.status}">${badge}</span>
-            <span class="alert-time">${z.time || '--:--:--'}</span>
-          </div>
-          <div class="alert-zone">${z.zone}</div>
-          <div class="alert-msg">${z.risk_reason || ''}</div>
-        </div>`;
-    }).join('');
+    count.textContent = zones.length + ' active' + (zones.length > 1 ? 's' : '');
+    body.innerHTML = zones.map(z => `
+      <div class="alert-item ${z.status}">
+        <div class="alert-top">
+          <span class="alert-badge ${z.status}">${z.status === 'danger' ? '⚠ CRITIQUE' : '◈ ATTENTION'}</span>
+          <span class="alert-time">${z.time || '--:--:--'}</span>
+        </div>
+        <div class="alert-zone">${z.zone}</div>
+        <div class="alert-msg">${z.risk_reason || ''}</div>
+      </div>`).join('');
   }
 
+  // ── Bars ───────────────────────────────────────────────────────────
   function updateBars(data) {
-    const body   = document.getElementById('bars-body');
-    const sorted = [...data].sort((a,b) => b.densite - a.densite);
-    body.innerHTML = sorted.map(z => {
-      const c = COLOR[z.status];
-      return `
+    document.getElementById('barsBody').innerHTML =
+      [...data].sort((a,b) => b.densite - a.densite).map(z => `
         <div class="bar-item">
           <div class="bar-top">
             <span class="bar-name">${z.zone}</span>
-            <span class="bar-val" style="color:${c}">${z.densite}%</span>
+            <span class="bar-val" style="color:${C[z.status]}">${z.densite}%</span>
           </div>
           <div class="bar-track">
-            <div class="bar-fill" style="width:${Math.min(z.densite,100)}%;background:${c}"></div>
+            <div class="bar-fill" style="width:${Math.min(z.densite,100)}%;background:${C[z.status]}"></div>
           </div>
-        </div>`;
-    }).join('');
+        </div>`).join('');
   }
 
+  // ── Footer + topbar level ──────────────────────────────────────────
   function updateFooter(data) {
-    const t = data[0]?.time || new Date().toLocaleTimeString('fr-FR');
-    document.getElementById('footer-time').textContent = t;
-    document.getElementById('last-update').textContent = 'MAJ ' + t;
+    const t = data[0]?.time || new Date().toLocaleTimeString('fr-FR', { hour12: false });
+    document.getElementById('footerTime').textContent = t;
 
-    const hasDanger = data.some(z => z.status === 'danger');
-    const hasModere = data.some(z => z.status === 'modere');
-    const lvl = hasDanger ? 'CRITIQUE' : hasModere ? 'ÉLEVÉ' : 'NORMAL';
-    const col = hasDanger ? 'var(--r)' : hasModere ? 'var(--y)' : 'var(--g)';
-    const bg  = hasDanger ? 'rgba(255,61,61,.12)' : hasModere ? 'rgba(255,186,0,.1)' : 'rgba(0,240,160,.08)';
+    const hD = data.some(z => z.status === 'danger');
+    const hM = data.some(z => z.status === 'modere');
+    const lvl = hD ? 'CRITIQUE' : hM ? 'ÉLEVÉ' : 'NORMAL';
+    const col = hD ? 'var(--r)' : hM ? 'var(--y)' : 'var(--g)';
+    const bg  = hD ? 'rgba(255,61,61,.12)' : hM ? 'rgba(255,186,0,.1)' : 'rgba(0,240,160,.08)';
 
-    const fb = document.getElementById('footer-level');
-    fb.textContent      = '● ' + lvl;
-    fb.style.color      = col;
-    fb.style.background = bg;
-  }
-
-  // ── Density chart (no external lib) ───────────────────────────────
-  function updateChart(data) {
-    const avg = Math.round(data.reduce((s,z) => s + z.densite, 0) / data.length);
-    const t   = data[0]?.time || new Date().toLocaleTimeString('fr-FR');
-    densityHistory.push({ avg, time: t });
-    if (densityHistory.length > 8) densityHistory.shift();
-    drawChart();
-  }
-
-  function drawChart() {
-    const canvas = document.getElementById('densityChart');
-    const ctx    = canvas.getContext('2d');
-    const W = canvas.offsetWidth;
-    const H = canvas.offsetHeight;
-    canvas.width  = W;
-    canvas.height = H;
-
-    const pts = densityHistory;
-    if (pts.length < 2) {
-      ctx.fillStyle = '#4A7080';
-      ctx.font = '12px Segoe UI';
-      ctx.textAlign = 'center';
-      ctx.fillText('En attente de données…', W/2, H/2);
-      return;
+    for (const id of ['footerLevel', 'topbarLevel']) {
+      const el = document.getElementById(id);
+      el.textContent = '● ' + lvl;
+      el.style.color = col;
+      el.style.background = bg;
     }
-
-    const PAD = { top: 12, right: 16, bottom: 28, left: 36 };
-    const cW = W - PAD.left - PAD.right;
-    const cH = H - PAD.top  - PAD.bottom;
-
-    const maxVal = Math.max(100, ...pts.map(p => p.avg));
-    const minVal = Math.max(0, Math.min(...pts.map(p => p.avg)) - 10);
-
-    function xPos(i)   { return PAD.left + (i / (pts.length - 1)) * cW; }
-    function yPos(val) { return PAD.top  + (1 - (val - minVal) / (maxVal - minVal)) * cH; }
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(24,40,50,.8)';
-    ctx.lineWidth = 1;
-    [25, 50, 60, 75, 85, 100].forEach(v => {
-      if (v < minVal || v > maxVal) return;
-      const y = yPos(v);
-      ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y); ctx.stroke();
-      ctx.fillStyle = '#4A7080'; ctx.font = '9px Segoe UI'; ctx.textAlign = 'right';
-      ctx.fillText(v + '%', PAD.left - 4, y + 3);
-    });
-
-    // Threshold bands
-    function fillBand(lo, hi, rgba) {
-      const y1 = yPos(Math.min(hi, maxVal));
-      const y2 = yPos(Math.max(lo, minVal));
-      if (y2 <= y1) return;
-      ctx.fillStyle = rgba;
-      ctx.fillRect(PAD.left, y1, cW, y2 - y1);
-    }
-    fillBand(85, 100, 'rgba(255,61,61,.05)');
-    fillBand(60,  85, 'rgba(255,186,0,.04)');
-    fillBand(0,   60, 'rgba(0,240,160,.03)');
-
-    // Area fill
-    const grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + cH);
-    const lastAvg = pts[pts.length-1].avg;
-    const topColor = lastAvg >= 85 ? '#FF3D3D' : lastAvg >= 60 ? '#FFBA00' : '#00F0A0';
-    grad.addColorStop(0, topColor + '40');
-    grad.addColorStop(1, topColor + '05');
-
-    ctx.beginPath();
-    ctx.moveTo(xPos(0), yPos(pts[0].avg));
-    pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), yPos(p.avg)); });
-    ctx.lineTo(xPos(pts.length-1), PAD.top + cH);
-    ctx.lineTo(xPos(0), PAD.top + cH);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    ctx.moveTo(xPos(0), yPos(pts[0].avg));
-    pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), yPos(p.avg)); });
-    ctx.strokeStyle = topColor;
-    ctx.lineWidth = 2;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-
-    // Dots + labels
-    pts.forEach((p, i) => {
-      const x = xPos(i); const y = yPos(p.avg);
-      const c = p.avg >= 85 ? '#FF3D3D' : p.avg >= 60 ? '#FFBA00' : '#00F0A0';
-
-      ctx.beginPath();
-      ctx.arc(x, y, 4, 0, Math.PI*2);
-      ctx.fillStyle = c; ctx.fill();
-      ctx.strokeStyle = '#060D12'; ctx.lineWidth = 1.5; ctx.stroke();
-
-      // Time label
-      ctx.fillStyle = '#4A7080'; ctx.font = '9px Segoe UI'; ctx.textAlign = 'center';
-      ctx.fillText(p.time, x, H - PAD.bottom + 12);
-
-      // Value label above dot
-      ctx.fillStyle = '#ECF4F8'; ctx.font = '9px Segoe UI';
-      ctx.fillText(p.avg + '%', x, y - 8);
-    });
   }
 
   // Boot
-  boot();
+  fetchAndRefresh();
 </script>
 </body>
 </html>
