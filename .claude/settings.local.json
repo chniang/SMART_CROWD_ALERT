@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python data/simulate.py)",
+      "Bash(streamlit run *)",
+      "Read(//c/Users/Lenovo/Desktop/**)",
+      "Read(//c/Users/Lenovo/**)",
+      "Read(//c/Users/Lenovo/Downloads/**)",
+      "Bash(pip install *)"
+    ]
+  }
+}

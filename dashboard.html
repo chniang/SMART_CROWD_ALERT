@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Crowd AI · JOJ Dakar 2026</title>
+<style>
+  :root {
+    --bg:     #060D12;
+    --bg2:    #0D1A21;
+    --bg3:    #112330;
+    --border: #182832;
+    --g:      #00F0A0;
+    --y:      #FFBA00;
+    --r:      #FF3D3D;
+    --text:   #ECF4F8;
+    --muted:  #4A7080;
+    --grid-line: rgba(0,240,160,0.04);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body {
+    min-height: 100%;
+    overflow-y: auto;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* ── NAVBAR ── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    height: 52px;
+    background: rgba(6,13,18,.97);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    padding: 0 20px;
+    backdrop-filter: blur(8px);
+  }
+  .nav-logo {
+    font-size: 15px; font-weight: 700; letter-spacing: .5px;
+    color: var(--g); display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .pulse-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--g);
+    animation: pulse 1.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .3; transform: scale(.6); }
+  }
+  .nav-sep { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+  .venue-switcher { display: flex; gap: 4px; }
+  .venue-btn {
+    padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-size: 12px; font-weight: 500; transition: all .2s;
+  }
+  .venue-btn.active {
+    background: rgba(0,240,160,.12); border-color: var(--g); color: var(--g);
+  }
+  .venue-btn:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .btn {
+    padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--bg2); color: var(--text); cursor: pointer;
+    font-size: 12px; font-weight: 500; transition: all .2s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--muted); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn-live { border-color: var(--r); color: var(--r); }
+  .btn-live.active { background: rgba(255,61,61,.15); }
+  .live-blink { animation: pulse 1s infinite; }
+  .nav-clock {
+    font-size: 13px; font-weight: 600; color: var(--g);
+    font-variant-numeric: tabular-nums; letter-spacing: .5px;
+    padding: 4px 10px; background: rgba(0,240,160,.06);
+    border: 1px solid rgba(0,240,160,.15); border-radius: 6px;
+  }
+
+  /* ── PAGE WRAPPER ── */
+  .page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 14px 16px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  /* ── KPIs ── */
+  .kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  }
+  .kpi {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px 18px; min-height: 100px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+  .kpi-value { font-size: 30px; font-weight: 700; line-height: 1.1; }
+  .kpi-sub   { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* ── MAIN GRID ── */
+  .grid-main {
+    display: grid; grid-template-columns: 60fr 40fr; gap: 12px;
+  }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 9px 14px; border-bottom: 1px solid var(--border);
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    letter-spacing: .8px; text-transform: uppercase;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .panel-body { padding: 12px; }
+
+  /* ── HEATMAP ── */
+  .heatmap {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .zone-card {
+    border-radius: 8px; border: 1px solid var(--border);
+    padding: 16px 14px; min-height: 130px;
+    display: flex; flex-direction: column; gap: 5px;
+    position: relative; transition: transform .15s;
+  }
+  .zone-card:hover { transform: translateY(-2px); }
+  .zone-card.danger {
+    border-color: rgba(255,61,61,.5);
+    background: rgba(255,61,61,.08);
+    animation: zpulse 1.8s ease-in-out infinite;
+  }
+  .zone-card.modere {
+    border-color: rgba(255,186,0,.4);
+    background: rgba(255,186,0,.06);
+  }
+  .zone-card.fluide {
+    border-color: rgba(0,240,160,.25);
+    background: rgba(0,240,160,.04);
+  }
+  @keyframes zpulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,61,61,0); }
+    50%      { box-shadow: 0 0 14px 3px rgba(255,61,61,.22); }
+  }
+  .zone-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 9px; font-weight: 700; letter-spacing: .5px;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .zone-badge.danger { background: rgba(255,61,61,.2);  color: var(--r); }
+  .zone-badge.modere { background: rgba(255,186,0,.15); color: var(--y); }
+  .zone-badge.fluide { background: rgba(0,240,160,.1);  color: var(--g); }
+  .zone-name   { font-size: 11px; font-weight: 700; color: var(--text); padding-right: 48px; }
+  .zone-pct    { font-size: 26px; font-weight: 700; line-height: 1; }
+  .zone-people { font-size: 10px; color: var(--muted); }
+  .zone-trend  { font-size: 11px; font-weight: 600; margin-top: 2px; }
+  .zone-reason { font-size: 10px; color: #7a9aaa; font-style: italic; margin-top: 3px; line-height: 1.3; }
+
+  .heatmap-legend {
+    display: flex; gap: 16px; padding: 8px 12px;
+    border-top: 1px solid var(--border);
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+  .legend-dot  { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── RIGHT COLUMN ── */
+  .right-col { display: flex; flex-direction: column; gap: 12px; }
+
+  /* ── ALERTS ── */
+  .alert-item {
+    border-radius: 7px; border-left: 3px solid;
+    padding: 9px 11px; margin-bottom: 7px; background: var(--bg3);
+  }
+  .alert-item.danger { border-color: var(--r); }
+  .alert-item.modere { border-color: var(--y); }
+  .alert-top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+  .alert-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: .6px;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .alert-badge.danger { background: rgba(255,61,61,.18); color: var(--r); }
+  .alert-badge.modere { background: rgba(255,186,0,.15); color: var(--y); }
+  .alert-time  { font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .alert-zone  { font-size: 12px; font-weight: 600; color: var(--text); }
+  .alert-msg   { font-size: 10px; color: #7a9aaa; font-style: italic; margin-top: 2px; line-height: 1.3; }
+  .alert-ok    { text-align: center; padding: 24px; color: var(--g); font-size: 13px; font-weight: 600; }
+
+  /* ── BARS ── */
+  .bar-item    { margin-bottom: 9px; }
+  .bar-top     { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .bar-name    { font-size: 11px; color: var(--text); }
+  .bar-val     { font-size: 11px; font-weight: 600; }
+  .bar-track   { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill    { height: 100%; border-radius: 3px; transition: width .5s ease; }
+
+  /* ── ROUTE MAP ── */
+  .route-map {
+    padding: 20px 24px;
+    display: flex; align-items: center;
+  }
+  .route-site {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    flex-shrink: 0; width: 90px;
+  }
+  .route-circle {
+    width: 60px; height: 60px; border-radius: 50%;
+    border: 3px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 700;
+    transition: border-color .4s, color .4s, background .4s;
+  }
+  .route-site-name {
+    font-size: 10px; font-weight: 600; color: var(--text);
+    text-align: center; line-height: 1.3;
+  }
+  .route-site-sub {
+    font-size: 9px; color: var(--muted); font-weight: 400;
+    text-align: center; line-height: 1.3;
+  }
+  .route-connector {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 5px; min-width: 70px;
+  }
+  .route-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 2px 9px; border-radius: 10px;
+    border: 1px solid; white-space: nowrap;
+    transition: all .4s;
+  }
+  .route-line {
+    width: 100%; height: 4px; border-radius: 2px;
+    transition: background .4s;
+  }
+
+  /* ── CHART ── */
+  .chart-panel { margin-top: 2px; }
+  .chart-wrap  {
+    padding: 14px 16px 10px;
+    position: relative; height: 160px;
+  }
+  #densityChart { width: 100%; height: 100%; }
+
+  /* ── FOOTER ── */
+  .footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0 2px;
+    font-size: 10px; color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+  .footer-badge {
+    padding: 3px 10px; border-radius: 4px;
+    font-weight: 600; font-size: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinning { animation: spin .6s linear infinite; display: inline-block; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="pulse-dot"></div>
+    ⚡ Smart Crowd AI
+  </div>
+  <div class="nav-sep"></div>
+  <div class="venue-switcher">
+    <button class="venue-btn active" data-venue="Stade LSS"                onclick="switchVenue(this)">Stade LSS</button>
+    <button class="venue-btn"        data-venue="Gare BRT · Dakar Dem Dikk" onclick="switchVenue(this)">Gare BRT · Dakar Dem Dikk</button>
+    <button class="venue-btn"        data-venue="Gare TER · Dakar-AIBD"     onclick="switchVenue(this)">Gare TER · Dakar-AIBD</button>
+  </div>
+  <div class="nav-right">
+    <button class="btn" id="refreshBtn" onclick="doRefresh()">🔄 Actualiser</button>
+    <button class="btn btn-live" id="liveBtn" onclick="toggleLive()">● LIVE</button>
+    <div class="nav-clock" id="clock">--:--:--</div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-label">Zones en danger</div>
+      <div class="kpi-value" id="kpi-danger">—</div>
+      <div class="kpi-sub" id="kpi-danger-sub">sur — zones</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Densité moyenne</div>
+      <div class="kpi-value" id="kpi-density">—</div>
+      <div class="kpi-sub">occupation globale</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total personnes</div>
+      <div class="kpi-value" id="kpi-people" style="color:var(--g)">—</div>
+      <div class="kpi-sub">présentes maintenant</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Zones surveillées</div>
+      <div class="kpi-value" id="kpi-zones">—</div>
+      <div class="kpi-sub">capteurs actifs</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid-main">
+
+    <!-- LEFT: heatmap -->
+    <div class="panel">
+      <div class="panel-head">
+        <span>🗺 Carte thermique — <span id="venue-label">Stade LSS</span></span>
+        <span id="last-update" style="font-size:10px;font-weight:400">—</span>
+      </div>
+      <div class="panel-body">
+        <div class="heatmap" id="heatmap"></div>
+      </div>
+      <div class="heatmap-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--g)"></div>FLUIDE (&lt;60%)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--y)"></div>MODÉRÉ (60–84%)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--r)"></div>DANGER (≥85%)</div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-col">
+      <div class="panel">
+        <div class="panel-head">
+          <span>🚨 Alertes actives</span>
+          <span id="alert-count" style="font-size:10px;font-weight:400;color:var(--r)"></span>
+        </div>
+        <div class="panel-body" id="alerts-body"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">📊 Capacité par zone</div>
+        <div class="panel-body" id="bars-body"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROUTE MAP -->
+  <div class="panel">
+    <div class="panel-head">
+      <span>🔗 Connectivité des sites — Route JOJ</span>
+      <span id="route-update" style="font-size:10px;font-weight:400">—</span>
+    </div>
+    <div class="route-map" id="routeMap">
+      <div style="color:var(--muted);font-size:12px;padding:8px">Chargement…</div>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="panel chart-panel">
+    <div class="panel-head">
+      <span>📈 Évolution de la densité — dernières mises à jour</span>
+      <span id="chart-range" style="font-size:10px;font-weight:400">8 dernières valeurs</span>
+    </div>
+    <div class="chart-wrap">
+      <canvas id="densityChart"></canvas>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Smart Crowd AI · JOJ Dakar 2026 · SONATEL</span>
+    <span>Dernière mise à jour : <span id="footer-time">—</span></span>
+    <span class="footer-badge" id="footer-level">—</span>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  const COLOR = { danger: '#FF3D3D', modere: '#FFBA00', fluide: '#00F0A0' };
+
+  let liveTimer    = null;
+  let currentVenue = 'Stade LSS';
+  let lastAllData  = {};
+  const densityHistory = [];   // { avg, time } — max 8 entries
+
+  // ── Clock ──────────────────────────────────────────────────────────
+  function updateClock() {
+    document.getElementById('clock').textContent =
+      new Date().toLocaleTimeString('fr-FR', { hour12: false });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ── Venue switch ───────────────────────────────────────────────────
+  function switchVenue(btn) {
+    document.querySelectorAll('.venue-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentVenue = btn.dataset.venue;
+    document.getElementById('venue-label').textContent = currentVenue;
+    loadVenue();
+  }
+
+  // ── Refresh button ─────────────────────────────────────────────────
+  async function doRefresh() {
+    const btn = document.getElementById('refreshBtn');
+    btn.innerHTML = '<span class="spinning">🔄</span> Actualiser';
+    btn.disabled = true;
+    try {
+      await fetchAndRefresh();
+    } catch(e) { console.error(e); }
+    btn.innerHTML = '🔄 Actualiser';
+    btn.disabled = false;
+  }
+
+  // ── Shared refresh+load ────────────────────────────────────────────
+  async function fetchAndRefresh() {
+    const res = await fetch('/api/refresh');
+    const allData = await res.json();
+    lastAllData = allData;
+    updateRouteMap(allData);
+    await loadVenue();
+  }
+
+  // ── Live toggle ────────────────────────────────────────────────────
+  function toggleLive() {
+    const btn = document.getElementById('liveBtn');
+    if (liveTimer) {
+      clearInterval(liveTimer);
+      liveTimer = null;
+      btn.classList.remove('active');
+      btn.innerHTML = '● LIVE';
+    } else {
+      btn.classList.add('active');
+      btn.innerHTML = '<span class="live-blink">●</span> LIVE';
+      liveTimer = setInterval(async () => {
+        try { await fetchAndRefresh(); } catch(e) {}
+      }, 5000);
+    }
+  }
+
+  // ── Fetch current venue data ───────────────────────────────────────
+  async function loadVenue() {
+    try {
+      const res = await fetch('/api/lieu?lieu=' + encodeURIComponent(currentVenue));
+      const data = await res.json();
+      if (data && data.length) updateUI(data);
+    } catch(e) { console.error('loadVenue error:', e); }
+  }
+
+  // ── Initial boot: refresh then load ───────────────────────────────
+  async function boot() {
+    try { await fetchAndRefresh(); } catch(e) { await loadVenue(); }
+  }
+
+  function fmt(n) { return Number(n).toLocaleString('fr-FR'); }
+
+  // ── Update all UI sections ─────────────────────────────────────────
+  function updateUI(data) {
+    updateKPIs(data);
+    updateHeatmap(data);
+    updateAlerts(data);
+    updateBars(data);
+    updateFooter(data);
+    updateChart(data);
+  }
+
+  function updateKPIs(data) {
+    const dangers = data.filter(z => z.status === 'danger').length;
+    const avgDensity = Math.round(data.reduce((s,z) => s + z.densite, 0) / data.length);
+    const totalPeople = data.reduce((s,z) => s + z.personnes, 0);
+    const avgScore = Math.round(data.reduce((s,z) => s + (z.risk_score || 0), 0) / data.length);
+
+    const kd = document.getElementById('kpi-danger');
+    kd.textContent = dangers;
+    kd.style.color = dangers > 0 ? 'var(--r)' : 'var(--g)';
+
+    const ksub = document.getElementById('kpi-danger-sub');
+    ksub.textContent = `sur ${data.length} zones · Score moy. : ${avgScore}/100`;
+
+    const kdens = document.getElementById('kpi-density');
+    kdens.textContent = avgDensity + '%';
+    kdens.style.color = avgDensity >= 80 ? 'var(--r)' : avgDensity >= 60 ? 'var(--y)' : 'var(--g)';
+
+    document.getElementById('kpi-people').textContent = fmt(totalPeople);
+    document.getElementById('kpi-zones').textContent  = data.length;
+  }
+
+  function trendColor(trend) {
+    if (trend === 'hausse_rapide') return 'var(--r)';
+    if (trend === 'hausse')        return 'var(--y)';
+    if (trend === 'baisse_rapide') return 'var(--g)';
+    if (trend === 'baisse')        return 'var(--g)';
+    return 'var(--muted)';
+  }
+
+  function updateHeatmap(data) {
+    const hm = document.getElementById('heatmap');
+    hm.innerHTML = data.map(z => {
+      const c    = COLOR[z.status];
+      const badge = z.status === 'danger' ? '⚠ DANGER' : z.status === 'modere' ? '~ MOD.' : '✓ OK';
+      const tc   = trendColor(z.trend);
+      return `
+        <div class="zone-card ${z.status}">
+          <span class="zone-badge ${z.status}">${badge}</span>
+          <div class="zone-name">${z.zone}</div>
+          <div class="zone-pct" style="color:${c}">${z.densite}%</div>
+          <div class="zone-people">${fmt(z.personnes)} / ${fmt(z.capacite)}</div>
+          <div class="zone-trend" style="color:${tc}">${z.trend_icon || ''} ${z.trend_label || ''}</div>
+          <div class="zone-reason">${z.risk_reason || ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateAlerts(data) {
+    const body  = document.getElementById('alerts-body');
+    const count = document.getElementById('alert-count');
+    const alertZones = data.filter(z => z.status === 'danger' || z.status === 'modere');
+
+    if (alertZones.length === 0) {
+      count.textContent = '';
+      body.innerHTML = '<div class="alert-ok">✓ Toutes les zones sont normales</div>';
+      return;
+    }
+
+    count.textContent = alertZones.length + ' active' + (alertZones.length > 1 ? 's' : '');
+    alertZones.sort((a,b) => (a.status === 'danger' ? -1 : 1));
+
+    body.innerHTML = alertZones.map(z => {
+      const badge = z.status === 'danger' ? '⚠ CRITIQUE' : '◈ ATTENTION';
+      return `
+        <div class="alert-item ${z.status}">
+          <div class="alert-top">
+            <span class="alert-badge ${z.status}">${badge}</span>
+            <span class="alert-time">${z.time || '--:--:--'}</span>
+          </div>
+          <div class="alert-zone">${z.zone}</div>
+          <div class="alert-msg">${z.risk_reason || ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateBars(data) {
+    const body   = document.getElementById('bars-body');
+    const sorted = [...data].sort((a,b) => b.densite - a.densite);
+    body.innerHTML = sorted.map(z => {
+      const c = COLOR[z.status];
+      return `
+        <div class="bar-item">
+          <div class="bar-top">
+            <span class="bar-name">${z.zone}</span>
+            <span class="bar-val" style="color:${c}">${z.densite}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${Math.min(z.densite,100)}%;background:${c}"></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function updateFooter(data) {
+    const t = data[0]?.time || new Date().toLocaleTimeString('fr-FR');
+    document.getElementById('footer-time').textContent = t;
+    document.getElementById('last-update').textContent = 'MAJ ' + t;
+
+    const hasDanger = data.some(z => z.status === 'danger');
+    const hasModere = data.some(z => z.status === 'modere');
+    const lvl = hasDanger ? 'CRITIQUE' : hasModere ? 'ÉLEVÉ' : 'NORMAL';
+    const col = hasDanger ? 'var(--r)' : hasModere ? 'var(--y)' : 'var(--g)';
+    const bg  = hasDanger ? 'rgba(255,61,61,.12)' : hasModere ? 'rgba(255,186,0,.1)' : 'rgba(0,240,160,.08)';
+
+    const fb = document.getElementById('footer-level');
+    fb.textContent      = '● ' + lvl;
+    fb.style.color      = col;
+    fb.style.background = bg;
+  }
+
+  // ── Density chart (no external lib) ───────────────────────────────
+  function updateChart(data) {
+    const avg = Math.round(data.reduce((s,z) => s + z.densite, 0) / data.length);
+    const t   = data[0]?.time || new Date().toLocaleTimeString('fr-FR');
+    densityHistory.push({ avg, time: t });
+    if (densityHistory.length > 8) densityHistory.shift();
+    drawChart();
+  }
+
+  function drawChart() {
+    const canvas = document.getElementById('densityChart');
+    const ctx    = canvas.getContext('2d');
+    const W = canvas.offsetWidth;
+    const H = canvas.offsetHeight;
+    canvas.width  = W;
+    canvas.height = H;
+
+    const pts = densityHistory;
+    if (pts.length < 2) {
+      ctx.fillStyle = '#4A7080';
+      ctx.font = '12px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.fillText('En attente de données…', W/2, H/2);
+      return;
+    }
+
+    const PAD = { top: 12, right: 16, bottom: 28, left: 36 };
+    const cW = W - PAD.left - PAD.right;
+    const cH = H - PAD.top  - PAD.bottom;
+
+    const maxVal = Math.max(100, ...pts.map(p => p.avg));
+    const minVal = Math.max(0, Math.min(...pts.map(p => p.avg)) - 10);
+
+    function xPos(i)   { return PAD.left + (i / (pts.length - 1)) * cW; }
+    function yPos(val) { return PAD.top  + (1 - (val - minVal) / (maxVal - minVal)) * cH; }
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(24,40,50,.8)';
+    ctx.lineWidth = 1;
+    [25, 50, 60, 75, 85, 100].forEach(v => {
+      if (v < minVal || v > maxVal) return;
+      const y = yPos(v);
+      ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(W - PAD.right, y); ctx.stroke();
+      ctx.fillStyle = '#4A7080'; ctx.font = '9px Segoe UI'; ctx.textAlign = 'right';
+      ctx.fillText(v + '%', PAD.left - 4, y + 3);
+    });
+
+    // Threshold bands
+    function fillBand(lo, hi, rgba) {
+      const y1 = yPos(Math.min(hi, maxVal));
+      const y2 = yPos(Math.max(lo, minVal));
+      if (y2 <= y1) return;
+      ctx.fillStyle = rgba;
+      ctx.fillRect(PAD.left, y1, cW, y2 - y1);
+    }
+    fillBand(85, 100, 'rgba(255,61,61,.05)');
+    fillBand(60,  85, 'rgba(255,186,0,.04)');
+    fillBand(0,   60, 'rgba(0,240,160,.03)');
+
+    // Area fill
+    const grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + cH);
+    const lastAvg = pts[pts.length-1].avg;
+    const topColor = lastAvg >= 85 ? '#FF3D3D' : lastAvg >= 60 ? '#FFBA00' : '#00F0A0';
+    grad.addColorStop(0, topColor + '40');
+    grad.addColorStop(1, topColor + '05');
+
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), yPos(pts[0].avg));
+    pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), yPos(p.avg)); });
+    ctx.lineTo(xPos(pts.length-1), PAD.top + cH);
+    ctx.lineTo(xPos(0), PAD.top + cH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // Line
+    ctx.beginPath();
+    ctx.moveTo(xPos(0), yPos(pts[0].avg));
+    pts.forEach((p, i) => { if (i > 0) ctx.lineTo(xPos(i), yPos(p.avg)); });
+    ctx.strokeStyle = topColor;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Dots + labels
+    pts.forEach((p, i) => {
+      const x = xPos(i); const y = yPos(p.avg);
+      const c = p.avg >= 85 ? '#FF3D3D' : p.avg >= 60 ? '#FFBA00' : '#00F0A0';
+
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI*2);
+      ctx.fillStyle = c; ctx.fill();
+      ctx.strokeStyle = '#060D12'; ctx.lineWidth = 1.5; ctx.stroke();
+
+      // Time label
+      ctx.fillStyle = '#4A7080'; ctx.font = '9px Segoe UI'; ctx.textAlign = 'center';
+      ctx.fillText(p.time, x, H - PAD.bottom + 12);
+
+      // Value label above dot
+      ctx.fillStyle = '#ECF4F8'; ctx.font = '9px Segoe UI';
+      ctx.fillText(p.avg + '%', x, y - 8);
+    });
+  }
+
+  // ── Route map ─────────────────────────────────────────────────────
+  const ROUTE_SITES = [
+    'Stade LSS',
+    'Gare BRT · Dakar Dem Dikk',
+    'Gare TER · Dakar-AIBD'
+  ];
+
+  function routeColor(avg) {
+    return avg >= 85 ? '#FF3D3D' : avg >= 60 ? '#FFBA00' : '#00F0A0';
+  }
+  function routeBg(avg) {
+    if (avg >= 85) return 'rgba(255,61,61,.1)';
+    if (avg >= 60) return 'rgba(255,186,0,.08)';
+    return 'rgba(0,240,160,.06)';
+  }
+  function connBadgeBg(avg) {
+    if (avg >= 85) return 'rgba(255,61,61,.18)';
+    if (avg >= 60) return 'rgba(255,186,0,.14)';
+    return 'rgba(0,240,160,.1)';
+  }
+
+  function updateRouteMap(allData) {
+    const avgs = {};
+    for (const [lieu, zones] of Object.entries(allData)) {
+      if (zones && zones.length) {
+        avgs[lieu] = Math.round(zones.reduce((s,z) => s + z.densite, 0) / zones.length);
+      }
+    }
+
+    const container = document.getElementById('routeMap');
+    let html = '';
+
+    ROUTE_SITES.forEach((site, i) => {
+      const avg = avgs[site] ?? 0;
+      const c   = routeColor(avg);
+      const bg  = routeBg(avg);
+      const parts = site.split(' · ');
+
+      html += `
+        <div class="route-site">
+          <div class="route-circle" style="border-color:${c};background:${bg};color:${c}">
+            ${avg > 0 ? avg + '%' : '—'}
+          </div>
+          <div class="route-site-name">${parts[0]}</div>
+          ${parts[1] ? `<div class="route-site-sub">${parts[1]}</div>` : ''}
+        </div>`;
+
+      if (i < ROUTE_SITES.length - 1) {
+        const nextSite = ROUTE_SITES[i + 1];
+        const nextAvg  = avgs[nextSite] ?? 0;
+        const connAvg  = avg > 0 && nextAvg > 0 ? Math.round((avg + nextAvg) / 2) : 0;
+        const cc  = routeColor(connAvg);
+        const cbg = connBadgeBg(connAvg);
+
+        html += `
+          <div class="route-connector">
+            <div class="route-badge" style="color:${cc};border-color:${cc};background:${cbg}">
+              ~${connAvg}% moy.
+            </div>
+            <div class="route-line" style="background:${cc}"></div>
+          </div>`;
+      }
+    });
+
+    container.innerHTML = html;
+
+    const now = new Date().toLocaleTimeString('fr-FR', { hour12: false });
+    const el = document.getElementById('route-update');
+    if (el) el.textContent = 'MAJ ' + now;
+  }
+
+  // Boot
+  boot();
+</script>
+</body>
+</html>

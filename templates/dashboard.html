@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Smart Crowd AI – Dakar 2026</title>
+<style>
+/* ===== RESET & BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+
+/* ===== VARIABLES ===== */
+:root{
+  --bg:#060D12;
+  --s1:#0D1A21;
+  --s2:#122028;
+  --g:#00F0A0;
+  --r:#FF3D3D;
+  --y:#FFBA00;
+  --b:#38BDF8;
+  --txt:#ECF4F8;
+  --dim:#4A7080;
+  --brd:#182832;
+  --glow:rgba(0,240,160,.15);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+  background:var(--bg);
+  color:var(--txt);
+  overflow-x:hidden;
+  font-size:16px;
+  line-height:1.5;
+}
+
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,240,160,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,240,160,.025) 1px,transparent 1px);
+  background-size:32px 32px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ===== NAV ===== */
+nav{
+  position:sticky;top:0;left:0;right:0;
+  z-index:99;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:rgba(6,13,18,.95);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--brd);
+}
+.logo{
+  display:flex;align-items:center;gap:9px;
+  font-weight:800;font-size:1rem;letter-spacing:-.03em;
+}
+.ldot{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--g);
+  box-shadow:0 0 10px var(--g);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.7);opacity:.5}}
+.nbadge{
+  font-size:.65rem;font-weight:600;letter-spacing:.08em;
+  color:var(--g);border:1px solid rgba(0,240,160,.35);
+  padding:5px 11px;border-radius:20px;
+  background:rgba(0,240,160,.07);
+}
+
+/* ===== SECTIONS ===== */
+section{position:relative;z-index:1}
+
+/* ===== HERO ===== */
+.hero{
+  min-height:auto;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;
+  text-align:center;
+  padding:70px 24px 50px;
+  overflow:hidden;
+}
+.hero-glow{
+  position:absolute;
+  width:400px;height:400px;
+  background:radial-gradient(circle,rgba(0,240,160,.07) 0%,transparent 70%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:.72rem;font-weight:600;letter-spacing:.1em;
+  color:var(--g);
+  background:rgba(0,240,160,.07);
+  border:1px solid rgba(0,240,160,.25);
+  padding:8px 16px;border-radius:20px;
+  margin-bottom:28px;
+  opacity:0;animation:fadeUp .7s .1s forwards;
+}
+h1{
+  font-size:clamp(2.6rem,11vw,5rem);
+  font-weight:900;letter-spacing:-.05em;
+  line-height:.95;
+  margin-bottom:10px;
+  opacity:0;animation:fadeUp .7s .2s forwards;
+}
+h1 .g{color:var(--g)}
+.sub{
+  font-size:clamp(1.3rem,5vw,2rem);
+  font-weight:700;letter-spacing:-.02em;
+  color:var(--dim);
+  margin-bottom:20px;
+  opacity:0;animation:fadeUp .7s .3s forwards;
+}
+.hero p{
+  font-size:.95rem;color:var(--dim);
+  max-width:340px;line-height:1.7;
+  margin-bottom:36px;
+  opacity:0;animation:fadeUp .7s .4s forwards;
+}
+.cta-row{
+  display:flex;flex-direction:column;gap:12px;
+  width:100%;max-width:280px;
+  opacity:0;animation:fadeUp .7s .5s forwards;
+}
+.btn-p{
+  background:var(--g);color:#060D12;
+  font-weight:800;font-size:.95rem;
+  padding:15px 28px;border-radius:6px;
+  border:none;cursor:pointer;
+  box-shadow:0 0 28px rgba(0,240,160,.35);
+  transition:all .2s;letter-spacing:.01em;
+}
+.btn-p:active{transform:scale(.97)}
+.btn-s{
+  background:transparent;color:var(--txt);
+  font-weight:600;font-size:.95rem;
+  padding:15px 28px;border-radius:6px;
+  border:1px solid var(--brd);cursor:pointer;
+  transition:all .2s;
+}
+.btn-s:active{border-color:var(--g);color:var(--g)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== STATS ===== */
+.stats{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  border-top:1px solid var(--brd);
+  border-bottom:1px solid var(--brd);
+  background:var(--s1);
+}
+.stat{
+  padding:24px 16px;text-align:center;
+  border-right:1px solid var(--brd);
+  border-bottom:1px solid var(--brd);
+}
+.stat:nth-child(2n){border-right:none}
+.stat:nth-child(3),.stat:nth-child(4){border-bottom:none}
+.snum{
+  font-size:2rem;font-weight:900;letter-spacing:-.05em;
+  color:var(--g);line-height:1;margin-bottom:5px;
+}
+.slbl{
+  font-size:.68rem;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.07em;
+  font-weight:500;
+}
+
+/* ===== TICKER ===== */
+.ticker-wrap{
+  overflow:hidden;
+  background:var(--s2);
+  border-bottom:1px solid var(--brd);
+  padding:10px 0;
+}
+.ticker{
+  display:flex;
+  animation:tick 22s linear infinite;
+  white-space:nowrap;
+}
+.tick-item{
+  flex-shrink:0;
+  font-size:.68rem;font-weight:500;
+  color:var(--dim);
+  padding:0 28px;letter-spacing:.04em;
+}
+.tick-item span{color:var(--g)}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ===== SECTION WRAPPER ===== */
+.wrap{
+  padding:64px 20px;
+  max-width:600px;margin:0 auto;
+}
+.stag{
+  display:flex;align-items:center;gap:8px;
+  font-size:.68rem;font-weight:600;
+  color:var(--g);text-transform:uppercase;
+  letter-spacing:.12em;margin-bottom:14px;
+}
+.stag::before{content:'';width:18px;height:1px;background:var(--g)}
+.wrap h2{
+  font-size:clamp(1.8rem,7vw,2.8rem);
+  font-weight:900;letter-spacing:-.04em;
+  line-height:1.05;margin-bottom:12px;
+}
+.desc{font-size:.9rem;color:var(--dim);line-height:1.7;margin-bottom:40px}
+
+/* ===== DASHBOARD ===== */
+.dash{
+  background:var(--s1);
+  border:1px solid var(--brd);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+.dh{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:12px 16px;
+  background:var(--s2);
+  border-bottom:1px solid var(--brd);
+}
+.dots{display:flex;gap:5px}
+.dot{width:9px;height:9px;border-radius:50%}
+.dtitle{font-size:.62rem;color:var(--dim);font-weight:500;letter-spacing:.04em}
+.live{
+  display:flex;align-items:center;gap:5px;
+  font-size:.62rem;color:var(--r);font-weight:600;
+}
+.ldot2{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--r);
+  animation:blink 1.2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* MAP */
+.map-area{padding:16px}
+.map-lbl{font-size:.62rem;color:var(--dim);letter-spacing:.06em;margin-bottom:8px;font-weight:500}
+.map-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-template-rows:repeat(4,1fr);
+  gap:3px;
+  height:160px;
+}
+.z{
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.5rem;font-weight:700;
+  transition:all .5s;
+}
+.zs{background:rgba(0,240,160,.12);border:1px solid rgba(0,240,160,.2);color:var(--g)}
+.zw{background:rgba(255,186,0,.12);border:1px solid rgba(255,186,0,.25);color:var(--y);animation:wp 2s infinite}
+.zd{background:rgba(255,61,61,.18);border:1px solid rgba(255,61,61,.35);color:var(--r);animation:dp 1.5s infinite}
+.ze{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04)}
+@keyframes wp{0%,100%{background:rgba(255,186,0,.12)}50%{background:rgba(255,186,0,.22)}}
+@keyframes dp{0%,100%{background:rgba(255,61,61,.18);box-shadow:none}50%{background:rgba(255,61,61,.3);box-shadow:0 0 10px rgba(255,61,61,.25)}}
+
+.legend{display:flex;gap:14px;margin-top:10px}
+.leg{
+  display:flex;align-items:center;gap:5px;
+  font-size:.6rem;font-weight:500;
+}
+.lbox{width:8px;height:8px;border-radius:2px}
+
+/* ALERTS */
+.alerts{padding:0 16px 16px}
+.al-title{font-size:.62rem;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-bottom:10px}
+.al{
+  background:var(--s2);border-radius:7px;
+  padding:11px 12px;
+  border-left:3px solid;
+  margin-bottom:8px;
+}
+.al.d{border-left-color:var(--r)}
+.al.w{border-left-color:var(--y)}
+.al.ok{border-left-color:var(--g)}
+.al-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.al-type{font-size:.63rem;font-weight:700;letter-spacing:.04em}
+.al.d .al-type{color:var(--r)}
+.al.w .al-type{color:var(--y)}
+.al.ok .al-type{color:var(--g)}
+.al-time{font-size:.58rem;color:var(--dim);font-weight:500}
+.al-msg{font-size:.78rem;color:var(--txt);line-height:1.4}
+.al-score{font-size:.65rem;color:var(--dim);margin-top:4px}
+
+/* METRICS */
+.metrics{padding:0 16px 16px}
+.mt{margin-bottom:10px}
+.mt-top{display:flex;justify-content:space-between;margin-bottom:5px}
+.mt-name{font-size:.7rem;color:var(--dim);font-weight:500}
+.mt-val{font-size:.7rem;font-weight:700}
+.bar{height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
+.fill{height:100%;border-radius:2px;transition:width 1.2s ease}
+
+/* ===== STEPS ===== */
+.steps{display:flex;flex-direction:column;gap:16px}
+.step{
+  background:var(--s1);
+  border:1px solid var(--brd);
+  border-radius:12px;
+  padding:24px 20px;
+  position:relative;overflow:hidden;
+  transition:border-color .3s;
+}
+.step::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+}
+.step:nth-child(1)::before{background:var(--g)}
+.step:nth-child(2)::before{background:var(--y)}
+.step:nth-child(3)::before{background:var(--b)}
+.step:nth-child(4)::before{background:#A78BFA}
+.sn{
+  font-size:3rem;font-weight:900;letter-spacing:-.06em;
+  opacity:.07;line-height:1;margin-bottom:-8px;
+}
+.si{font-size:1.7rem;margin-bottom:12px;display:block}
+.stitle{font-size:1.05rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+.sdesc{font-size:.83rem;color:var(--dim);line-height:1.65}
+.stag2{
+  display:inline-block;margin-top:12px;
+  font-size:.6rem;font-weight:600;
+  padding:4px 9px;border-radius:3px;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.step:nth-child(1) .stag2{background:rgba(0,240,160,.1);color:var(--g);border:1px solid rgba(0,240,160,.2)}
+.step:nth-child(2) .stag2{background:rgba(255,186,0,.1);color:var(--y);border:1px solid rgba(255,186,0,.2)}
+.step:nth-child(3) .stag2{background:rgba(56,189,248,.1);color:var(--b);border:1px solid rgba(56,189,248,.2)}
+.step:nth-child(4) .stag2{background:rgba(167,139,250,.1);color:#A78BFA;border:1px solid rgba(167,139,250,.2)}
+
+/* ===== IMPACT ===== */
+.impact-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);
+  gap:2px;
+  border:1px solid var(--brd);border-radius:12px;overflow:hidden;
+}
+.ic{
+  background:var(--s1);
+  padding:24px 16px;text-align:center;
+  border-right:1px solid var(--brd);
+  border-bottom:1px solid var(--brd);
+}
+.ic:nth-child(2n){border-right:none}
+.ic:nth-last-child(-n+2){border-bottom:none}
+.ic-icon{font-size:1.8rem;margin-bottom:10px;display:block}
+.ic-num{
+  font-size:1.7rem;font-weight:900;letter-spacing:-.04em;
+  color:var(--g);line-height:1;margin-bottom:6px;
+}
+.ic-lbl{font-size:.73rem;color:var(--dim);line-height:1.4}
+
+/* ===== BIZ ===== */
+.biz-grid{display:flex;flex-direction:column;gap:14px}
+.bz{
+  background:var(--s1);
+  border:1px solid var(--brd);
+  border-radius:12px;
+  padding:22px 20px;
+  display:flex;gap:16px;align-items:flex-start;
+}
+.bz-icon{font-size:1.8rem;flex-shrink:0;margin-top:2px}
+.bz-title{font-size:.95rem;font-weight:800;margin-bottom:6px;letter-spacing:-.01em}
+.bz-desc{font-size:.8rem;color:var(--dim);line-height:1.6}
+
+/* ===== CTA ===== */
+.cta-sec{
+  padding:80px 24px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(0,240,160,.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+.cta-sec h2{
+  font-size:clamp(2rem,9vw,3.2rem);
+  font-weight:900;letter-spacing:-.05em;
+  line-height:1.05;margin-bottom:16px;
+}
+.cta-sec p{font-size:.9rem;color:var(--dim);max-width:320px;margin:0 auto 36px;line-height:1.7}
+.cta-btns{display:flex;flex-direction:column;gap:12px;max-width:280px;margin:0 auto}
+
+/* ===== FOOTER ===== */
+footer{
+  border-top:1px solid var(--brd);
+  padding:24px 20px;
+  text-align:center;
+}
+.ft{font-size:.7rem;color:var(--dim);margin-bottom:6px}
+
+/* ===== DIVIDER ===== */
+.sep{height:1px;background:linear-gradient(90deg,transparent,var(--brd),transparent);position:relative;z-index:1}
+
+/* ===== REVEAL ===== */
+.rv{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.rv.on{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="ldot"></div>
+    Smart Crowd AI
+  </div>
+  <div class="nbadge">🇸🇳 {{JOUR}} · {{HEURE}}h00</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="badge">🎯 PROJET INNOVANT · JO 2026</div>
+  <h1>Foules<br><span class="g">intelligentes.</span><br>Zéro risque.</h1>
+  <div class="sub">Sécurité & Fluidité IA</div>
+  <p>Analyser, anticiper, guider les foules en temps réel lors des grands événements de Dakar 2026.</p>
+  <div class="cta-row">
+    <button class="btn-p" onclick="document.getElementById('dash-sec').scrollIntoView({behavior:'smooth'})">Voir la démo →</button>
+    <button class="btn-s" onclick="document.getElementById('how-sec').scrollIntoView({behavior:'smooth'})">Comment ça marche</button>
+  </div>
+</section>
+
+<!-- STATS (données réelles) -->
+<div class="stats rv">
+  <div class="stat">
+    <div class="snum" id="s1">{{TOTAL_AFFLUENCE}}</div>
+    <div class="slbl">Affluence totale</div>
+  </div>
+  <div class="stat">
+    <div class="snum" id="s2" style="color:{{COLOR_CRITIQUES}}">{{ZONES_CRITIQUES}}</div>
+    <div class="slbl">Zones critiques</div>
+  </div>
+  <div class="stat">
+    <div class="snum" id="s3">{{TAUX_MOYEN}}%</div>
+    <div class="slbl">Taux occupation moyen</div>
+  </div>
+  <div class="stat">
+    <div class="snum" id="s4" style="color:{{COLOR_SCORE}}">{{SCORE_GLOBAL}}</div>
+    <div class="slbl">Indice risque /100</div>
+  </div>
+</div>
+
+<!-- TICKER (données réelles) -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    {{TICKER_ITEMS}}
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<section id="dash-sec">
+  <div class="wrap">
+    <div class="stag">Tableau de bord</div>
+    <h2 class="rv">Contrôle<br>en temps réel</h2>
+    <p class="desc rv">Zones de danger, flux, alertes automatiques — tout sur un seul écran.</p>
+
+    <div class="dash rv">
+      <div class="dh">
+        <div class="dots">
+          <div class="dot" style="background:#FF3D3D"></div>
+          <div class="dot" style="background:#FFBA00"></div>
+          <div class="dot" style="background:#00F0A0"></div>
+        </div>
+        <div class="dtitle">{{JOUR}} · {{HEURE}}h00 · DAKAR</div>
+        <div class="live"><div class="ldot2"></div>DIRECT</div>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-area">
+        <div class="map-lbl">CARTE THERMIQUE</div>
+        <div class="map-grid" id="mg"></div>
+        <div class="legend">
+          <div class="leg"><div class="lbox" style="background:rgba(0,240,160,.4)"></div><span style="color:var(--g);font-size:.6rem">FLUIDE</span></div>
+          <div class="leg"><div class="lbox" style="background:rgba(255,186,0,.4)"></div><span style="color:var(--y);font-size:.6rem">MODÉRÉ</span></div>
+          <div class="leg"><div class="lbox" style="background:rgba(255,61,61,.4)"></div><span style="color:var(--r);font-size:.6rem">DANGER</span></div>
+        </div>
+      </div>
+
+      <!-- ALERTS (données réelles) -->
+      <div class="alerts">
+        <div class="al-title">Alertes actives</div>
+        {{ALERT_CARDS}}
+      </div>
+
+      <!-- METRICS (données réelles) -->
+      <div class="metrics">
+        <div class="al-title">Capacité par zone</div>
+        {{METRIC_BARS}}
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how-sec">
+  <div class="wrap">
+    <div class="stag">Fonctionnement</div>
+    <h2 class="rv">4 piliers<br>technologiques</h2>
+    <p class="desc rv">De la caméra au guidage du spectateur — une chaîne complète pilotée par l'IA.</p>
+
+    <div class="steps">
+      <div class="step rv">
+        <div class="sn">01</div>
+        <span class="si">📹</span>
+        <div class="stitle">Analyse Vidéo IA</div>
+        <div class="sdesc">Caméras + IA détectent en temps réel zones surchargées, mouvements anormaux et regroupements dangereux. Alertes instantanées aux agents.</div>
+        <span class="stag2">Vision par ordinateur</span>
+      </div>
+      <div class="step rv">
+        <div class="sn">02</div>
+        <span class="si">📊</span>
+        <div class="stitle">Tableau de Bord</div>
+        <div class="sdesc">Écran central unifiant toutes les données : zones rouges, flux de circulation, alertes en direct. Coordination en quelques secondes.</div>
+        <span class="stag2">Interface temps réel</span>
+      </div>
+      <div class="step rv">
+        <div class="sn">03</div>
+        <span class="si">📱</span>
+        <div class="stitle">App Grand Public</div>
+        <div class="sdesc">Spectateurs voient zones disponibles, meilleurs itinéraires et reçoivent alertes personnalisées. Expérience améliorée, congestions réduites.</div>
+        <span class="stag2">Mobile · Multilingue</span>
+      </div>
+      <div class="step rv">
+        <div class="sn">04</div>
+        <span class="si">🧭</span>
+        <div class="stitle">Navigation Intelligente</div>
+        <div class="sdesc">Calcul dynamique des entrées fluides, sorties rapides et chemins sécurisés — adapté en permanence selon la densité réelle.</div>
+        <span class="stag2">Routage adaptatif</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- IMPACT -->
+<section>
+  <div class="wrap">
+    <div class="stag">Impact</div>
+    <h2 class="rv">Des résultats<br>concrets</h2>
+    <p class="desc rv">Réduction des risques, meilleure expérience, base d'une ville intelligente au Sénégal.</p>
+
+    <div class="impact-grid rv">
+      <div class="ic">
+        <span class="ic-icon">🛡️</span>
+        <div class="ic-num">-80%</div>
+        <div class="ic-lbl">Incidents de sécurité</div>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">⚡</span>
+        <div class="ic-num">3s</div>
+        <div class="ic-lbl">Détection d'anomalie</div>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">😊</span>
+        <div class="ic-num">+65%</div>
+        <div class="ic-lbl">Satisfaction spectateurs</div>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">🏟️</span>
+        <div class="ic-num">50K+</div>
+        <div class="ic-lbl">Personnes simultanées</div>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">📡</span>
+        <div class="ic-num">24/7</div>
+        <div class="ic-lbl">Surveillance continue</div>
+      </div>
+      <div class="ic">
+        <span class="ic-icon">🌍</span>
+        <div class="ic-num">∞</div>
+        <div class="ic-lbl">Concerts · Stades · Marchés</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sep"></div>
+
+<!-- BUSINESS MODEL -->
+<section>
+  <div class="wrap">
+    <div class="stag">Modèle économique</div>
+    <h2 class="rv">Rentable<br>& scalable</h2>
+    <p class="desc rv">Trois sources de revenus pour une croissance durable au Sénégal et en Afrique.</p>
+
+    <div class="biz-grid">
+      <div class="bz rv">
+        <div class="bz-icon">💼</div>
+        <div>
+          <div class="bz-title">Vente directe</div>
+          <div class="bz-desc">Cession du système complet aux organisateurs d'événements majeurs et collectivités locales.</div>
+        </div>
+      </div>
+      <div class="bz rv">
+        <div class="bz-icon">🔄</div>
+        <div>
+          <div class="bz-title">Abonnement SaaS</div>
+          <div class="bz-desc">Accès mensuel à la plateforme cloud pour championnats, festivals, matchs, concerts récurrents.</div>
+        </div>
+      </div>
+      <div class="bz rv">
+        <div class="bz-icon">🤝</div>
+        <div>
+          <div class="bz-title">Partenariats</div>
+          <div class="bz-desc">Collaboration avec Sonatel, Orange et communes de Dakar pour déploiement à l'échelle de la ville.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="cta-bg"></div>
+  <div class="badge" style="animation:none;opacity:1;margin-bottom:24px">🚀 REJOIGNEZ L'AVENTURE</div>
+  <h2 class="rv">Dakar 2026<br><span class="g">mérite le<br>meilleur.</span></h2>
+  <p>Smart Crowd AI est prêt à sécuriser les Jeux Olympiques et devenir la référence africaine.</p>
+  <div class="cta-btns">
+    <button class="btn-p">Contacter l'équipe</button>
+    <button class="btn-s">Télécharger le pitch</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft">© 2026 Smart Crowd AI · Dakar, Sénégal 🇸🇳</div>
+  <div class="ft">Conçu pour l'Afrique, inspiré du monde · Niveau global : <span style="color:{{COLOR_SCORE}}">{{NIVEAU_GLOBAL}}</span></div>
+</footer>
+
+<script>
+// MAP GRID (animé avec données réelles injectées)
+const mg = document.getElementById('mg');
+const zoneData = {{ZONE_DATA_JSON}};
+const gridPattern = [
+  'ze','ze','ze','ze','ze','ze',
+  'ze','ze','ze','ze','ze','ze',
+  'ze','ze','ze','ze','ze','ze',
+  'ze','ze','ze','ze','ze','ze',
+];
+
+// Remplir la grille avec les données des zones
+zoneData.forEach((z, i) => {
+  if (i < gridPattern.length) {
+    gridPattern[i] = z.cls;
+  }
+});
+// Disperser les zones dans la grille pour un rendu visuel
+const positions = [1, 3, 5, 7, 9, 12, 14, 16];
+zoneData.forEach((z, i) => {
+  if (i < positions.length) gridPattern[positions[i]] = z.cls;
+});
+
+gridPattern.forEach((c, i) => {
+  const d = document.createElement('div');
+  d.className = 'z ' + c;
+  const zd = zoneData.find((_, idx) => positions[idx] === i);
+  if (zd) d.title = zd.name;
+  mg.appendChild(d);
+});
+
+// LIVE CLOCK
+setInterval(() => {
+  document.querySelectorAll('.al-time.live-clock').forEach(el => {
+    el.textContent = new Date().toLocaleTimeString('fr-FR');
+  });
+}, 1000);
+
+// MAP RANDOM UPDATE (animation)
+setInterval(() => {
+  const cells = mg.querySelectorAll('.z:not(.ze)');
+  if (cells.length > 0) {
+    const i = Math.floor(Math.random() * cells.length);
+    const states = ['zs', 'zw', 'zd'];
+    cells[i].className = 'z ' + states[Math.floor(Math.random() * states.length)];
+  }
+}, 2800);
+
+// SCROLL REVEAL
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('on'), i * 70);
+      obs.unobserve(e.target);
+    }
+  });
+}, {threshold: .12});
+document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
