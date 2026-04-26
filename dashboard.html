@@ -336,17 +336,19 @@
   </div>
 
   <nav class="sb-nav">
-    <div class="sb-group">Stades</div>
-    <button class="sb-site active" data-site="Stade Abdoulaye Wade"    onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Stade Abdoulaye Wade</span></button>
-    <button class="sb-site"        data-site="Dakar Arena"             onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Dakar Arena</span></button>
-    <button class="sb-site"        data-site="Stade Iba Mar Diop"      onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Stade Iba Mar Diop</span></button>
-    <button class="sb-site"        data-site="Corniche Ouest"          onclick="switchSite(this)"><span class="sb-icon">🏖</span><span class="sb-site-text"> Corniche Ouest</span></button>
-    <button class="sb-site"        data-site="Complexe Tour de l'Oeuf" onclick="switchSite(this)"><span class="sb-icon">🏊</span><span class="sb-site-text"> Complexe Tour de l'Oeuf</span></button>
-    <button class="sb-site"        data-site="Saly Beach West"         onclick="switchSite(this)"><span class="sb-icon">🏖</span><span class="sb-site-text"> Saly Beach West</span></button>
+    <div class="sb-group">Zone Dakar</div>
+    <button class="sb-site active" data-site="Complexe Tour de l'Oeuf"      onclick="switchSite(this)"><span class="sb-icon">🏊</span><span class="sb-site-text"> Complexe Tour de l'Oeuf</span></button>
+    <button class="sb-site"        data-site="Stade Iba Mar Diop"           onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Stade Iba Mar Diop</span></button>
+    <button class="sb-site"        data-site="Corniche Ouest"               onclick="switchSite(this)"><span class="sb-icon">🌊</span><span class="sb-site-text"> Corniche Ouest</span></button>
 
-    <div class="sb-group" style="margin-top:6px">Gares</div>
-    <button class="sb-site" data-site="Gare Obélisque (BRT)" onclick="switchSite(this)"><span class="sb-icon">🚌</span><span class="sb-site-text"> Gare Obélisque (BRT)</span></button>
-    <button class="sb-site" data-site="Gare Colobane (TER)"  onclick="switchSite(this)"><span class="sb-icon">🚆</span><span class="sb-site-text"> Gare Colobane (TER)</span></button>
+    <div class="sb-group">Zone Diamniadio</div>
+    <button class="sb-site"        data-site="Dakar Arena"                  onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Dakar Arena</span></button>
+    <button class="sb-site"        data-site="Stade Abdoulaye Wade"         onclick="switchSite(this)"><span class="sb-icon">🎯</span><span class="sb-site-text"> Stade Abdoulaye Wade</span></button>
+    <button class="sb-site"        data-site="Centre des Expositions"       onclick="switchSite(this)"><span class="sb-icon">🥋</span><span class="sb-site-text"> Centre des Expositions</span></button>
+    <button class="sb-site"        data-site="Centre Equestre Gendarmerie"  onclick="switchSite(this)"><span class="sb-icon">🏇</span><span class="sb-site-text"> Centre Equestre</span></button>
+
+    <div class="sb-group">Zone Saly</div>
+    <button class="sb-site"        data-site="Saly Beach West"              onclick="switchSite(this)"><span class="sb-icon">🏖</span><span class="sb-site-text"> Saly Beach West</span></button>
   </nav>
 
   <div class="sb-bottom">
@@ -361,7 +363,7 @@
 
   <!-- TOPBAR -->
   <header class="topbar">
-    <span class="topbar-title" id="topbarTitle">Stade Abdoulaye Wade</span>
+    <span class="topbar-title" id="topbarTitle">Complexe Tour de l'Oeuf</span>
     <span id="siteCapBadge" style="font-size:.72rem;color:#4A7080;background:#112330;border:1px solid #182832;padding:3px 10px;border-radius:12px;margin-left:12px">—</span>
     <div class="topbar-sep"></div>
     <div class="offline-badge" id="offlineBadge"></div>
@@ -493,7 +495,7 @@
 <script>
   const C = { danger: '#FF3D3D', modere: '#FFBA00', fluide: '#00F0A0' };
 
-  let currentSite = 'Stade Abdoulaye Wade';
+  let currentSite = "Complexe Tour de l'Oeuf";
   let liveTimer   = null;
   let isOffline   = false;
   let reconnTimer = null;

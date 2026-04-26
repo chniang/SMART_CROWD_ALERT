@@ -14,83 +14,108 @@ CORS(app)
 df_base = pd.read_csv("data/joj_crowd_data.csv")
 
 LIEUX = {
-    "Stade Abdoulaye Wade": [
-        {"zone": "Tribune Nord",      "capacite": 10000, "lat": 14.7250, "lng": -17.4671},
-        {"zone": "Tribune Sud",       "capacite": 10000, "lat": 14.7238, "lng": -17.4671},
-        {"zone": "Tribune Est",       "capacite":  4000, "lat": 14.7244, "lng": -17.4660},
-        {"zone": "Tribune Ouest",     "capacite":  4000, "lat": 14.7244, "lng": -17.4682},
-        {"zone": "Entrée Principale", "capacite":  5000, "lat": 14.7232, "lng": -17.4671},
-        {"zone": "Entrée Secondaire", "capacite":  2500, "lat": 14.7258, "lng": -17.4665},
-        {"zone": "Zone VIP",          "capacite":  1000, "lat": 14.7244, "lng": -17.4667},
-        {"zone": "Parking",           "capacite":  3000, "lat": 14.7222, "lng": -17.4678},
-    ],
-    "Dakar Arena": [
-        {"zone": "Secteur A",         "capacite": 4000, "lat": 14.7291, "lng": -17.2461},
-        {"zone": "Secteur B",         "capacite": 4000, "lat": 14.7291, "lng": -17.2477},
-        {"zone": "Secteur C",         "capacite": 4000, "lat": 14.7277, "lng": -17.2461},
-        {"zone": "Secteur D",         "capacite": 4000, "lat": 14.7277, "lng": -17.2477},
-        {"zone": "Entrée Principale", "capacite": 3000, "lat": 14.7269, "lng": -17.2469},
-        {"zone": "Entrée Secondaire", "capacite": 2000, "lat": 14.7299, "lng": -17.2469},
-        {"zone": "Zone Médias",       "capacite":  500, "lat": 14.7284, "lng": -17.2454},
-        {"zone": "Parking",           "capacite": 2000, "lat": 14.7260, "lng": -17.2482},
-    ],
-    "Stade Iba Mar Diop": [
-        {"zone": "Tribune Nord",      "capacite": 6000, "lat": 14.6885, "lng": -17.4452},
-        {"zone": "Tribune Sud",       "capacite": 6000, "lat": 14.6869, "lng": -17.4452},
-        {"zone": "Tribune Est",       "capacite": 2500, "lat": 14.6877, "lng": -17.4443},
-        {"zone": "Tribune Ouest",     "capacite": 2500, "lat": 14.6877, "lng": -17.4461},
-        {"zone": "Entrée Principale", "capacite": 3000, "lat": 14.6863, "lng": -17.4452},
-        {"zone": "Entrée Secondaire", "capacite": 1500, "lat": 14.6891, "lng": -17.4452},
-        {"zone": "Fan Zone",          "capacite": 2000, "lat": 14.6877, "lng": -17.4437},
-        {"zone": "Parking",           "capacite": 1500, "lat": 14.6855, "lng": -17.4460},
-    ],
-    "Corniche Ouest": [
-        {"zone": "Zone Plage Nord",   "capacite": 5000, "lat": 14.7082, "lng": -17.4958},
-        {"zone": "Zone Plage Sud",    "capacite": 5000, "lat": 14.7038, "lng": -17.4962},
-        {"zone": "Zone VIP",          "capacite": 1000, "lat": 14.7065, "lng": -17.4948},
-        {"zone": "Entrée Principale", "capacite": 3000, "lat": 14.7060, "lng": -17.4972},
-        {"zone": "Zone Restauration", "capacite": 2000, "lat": 14.7055, "lng": -17.4952},
-        {"zone": "Parking",           "capacite": 1500, "lat": 14.7048, "lng": -17.4978},
-        {"zone": "Zone Médias",       "capacite":  300, "lat": 14.7072, "lng": -17.4944},
-    ],
+
+    # ── ZONE DAKAR ────────────────────────────────────────────────────────────
+
     "Complexe Tour de l'Oeuf": [
-        {"zone": "Piscine Principale","capacite": 3000, "lat": 14.6943, "lng": -17.4848},
-        {"zone": "Piscine Secondaire","capacite": 2000, "lat": 14.6937, "lng": -17.4852},
-        {"zone": "Tribune Piscine",   "capacite": 2500, "lat": 14.6946, "lng": -17.4844},
-        {"zone": "Entrée Principale", "capacite": 2000, "lat": 14.6931, "lng": -17.4856},
-        {"zone": "Zone Échauffement", "capacite":  800, "lat": 14.6935, "lng": -17.4842},
-        {"zone": "Zone Médias",       "capacite":  300, "lat": 14.6949, "lng": -17.4841},
-        {"zone": "Parking",           "capacite": 1000, "lat": 14.6927, "lng": -17.4862},
+        # Sports : Natation, Basketball 3x3, Breaking, Baseball5, Skateboard
+        {"zone": "Piscine Olympique",        "cap": 3000,  "lat": 14.6892, "lng": -17.4550, "source": "iot_counter"},
+        {"zone": "Piscine d'Echauffement",   "cap": 800,   "lat": 14.6891, "lng": -17.4552, "source": "wifi_hotspot"},
+        {"zone": "Tribune Piscine",          "cap": 2500,  "lat": 14.6893, "lng": -17.4549, "source": "orange_antenna"},
+        {"zone": "Aire Basketball 3x3",      "cap": 1500,  "lat": 14.6895, "lng": -17.4548, "source": "iot_counter"},
+        {"zone": "Aire Breaking / Skate",    "cap": 1200,  "lat": 14.6896, "lng": -17.4547, "source": "iot_counter"},
+        {"zone": "Entree Principale",        "cap": 2000,  "lat": 14.6890, "lng": -17.4553, "source": "iot_counter"},
+        {"zone": "Entree Secondaire",        "cap": 1000,  "lat": 14.6889, "lng": -17.4554, "source": "iot_counter"},
+        {"zone": "Parking",                  "cap": 1500,  "lat": 14.6888, "lng": -17.4556, "source": "orange_antenna"},
     ],
+
+    "Stade Iba Mar Diop": [
+        # Sports : Athletisme, Boxe, Futsal, Rugby a 7
+        {"zone": "Tribune Nord",             "cap": 6000,  "lat": 14.7005, "lng": -17.4580, "source": "orange_antenna"},
+        {"zone": "Tribune Sud",              "cap": 6000,  "lat": 14.7003, "lng": -17.4582, "source": "orange_antenna"},
+        {"zone": "Tribune Est",              "cap": 3000,  "lat": 14.7004, "lng": -17.4578, "source": "orange_antenna"},
+        {"zone": "Tribune Ouest",            "cap": 3000,  "lat": 14.7004, "lng": -17.4584, "source": "orange_antenna"},
+        {"zone": "Piste d'Athletisme",       "cap": 500,   "lat": 14.7004, "lng": -17.4581, "source": "wifi_hotspot"},
+        {"zone": "Salle de Boxe",            "cap": 800,   "lat": 14.7006, "lng": -17.4579, "source": "iot_counter"},
+        {"zone": "Entree Principale",        "cap": 3000,  "lat": 14.7002, "lng": -17.4583, "source": "iot_counter"},
+        {"zone": "Parking",                  "cap": 2000,  "lat": 14.7001, "lng": -17.4585, "source": "orange_antenna"},
+    ],
+
+    "Corniche Ouest": [
+        # Sports : Cyclisme sur route + 10 sports d'engagement (surf, voile cote, etc.)
+        {"zone": "Zone Depart Cyclisme",     "cap": 2000,  "lat": 14.7120, "lng": -17.4820, "source": "iot_counter"},
+        {"zone": "Zone Arrivee Cyclisme",    "cap": 3000,  "lat": 14.7115, "lng": -17.4818, "source": "iot_counter"},
+        {"zone": "Plage Nord - Engagement",  "cap": 4000,  "lat": 14.7125, "lng": -17.4825, "source": "orange_antenna"},
+        {"zone": "Plage Sud - Engagement",   "cap": 4000,  "lat": 14.7110, "lng": -17.4815, "source": "orange_antenna"},
+        {"zone": "Zone VIP / Medias",        "cap": 600,   "lat": 14.7118, "lng": -17.4821, "source": "wifi_hotspot"},
+        {"zone": "Entree Principale",        "cap": 2500,  "lat": 14.7112, "lng": -17.4817, "source": "iot_counter"},
+        {"zone": "Zone Restauration",        "cap": 1500,  "lat": 14.7122, "lng": -17.4823, "source": "wifi_hotspot"},
+        {"zone": "Parking",                  "cap": 2000,  "lat": 14.7108, "lng": -17.4812, "source": "orange_antenna"},
+    ],
+
+    # ── ZONE DIAMNIADIO ───────────────────────────────────────────────────────
+
+    "Dakar Arena": [
+        # Sports : Badminton, Futsal
+        {"zone": "Secteur A - Nord",         "cap": 4000,  "lat": 14.7280, "lng": -17.1420, "source": "orange_antenna"},
+        {"zone": "Secteur B - Sud",          "cap": 4000,  "lat": 14.7278, "lng": -17.1422, "source": "orange_antenna"},
+        {"zone": "Secteur C - Est",          "cap": 3500,  "lat": 14.7282, "lng": -17.1418, "source": "orange_antenna"},
+        {"zone": "Secteur D - Ouest",        "cap": 3500,  "lat": 14.7276, "lng": -17.1424, "source": "orange_antenna"},
+        {"zone": "Aire Badminton",           "cap": 400,   "lat": 14.7280, "lng": -17.1421, "source": "wifi_hotspot"},
+        {"zone": "Entree Principale",        "cap": 3000,  "lat": 14.7275, "lng": -17.1425, "source": "iot_counter"},
+        {"zone": "Zone Medias",              "cap": 300,   "lat": 14.7283, "lng": -17.1417, "source": "wifi_hotspot"},
+        {"zone": "Parking",                  "cap": 2500,  "lat": 14.7272, "lng": -17.1428, "source": "orange_antenna"},
+    ],
+
+    "Stade Abdoulaye Wade": [
+        # Sports : Tir a l'arc + Ceremonie d'ouverture
+        {"zone": "Tribune Nord",             "cap": 10000, "lat": 14.7260, "lng": -17.1380, "source": "orange_antenna"},
+        {"zone": "Tribune Sud",              "cap": 10000, "lat": 14.7258, "lng": -17.1382, "source": "orange_antenna"},
+        {"zone": "Tribune Est",              "cap": 4000,  "lat": 14.7262, "lng": -17.1378, "source": "orange_antenna"},
+        {"zone": "Tribune Ouest",            "cap": 4000,  "lat": 14.7258, "lng": -17.1384, "source": "orange_antenna"},
+        {"zone": "Aire de Tir a l'arc",      "cap": 500,   "lat": 14.7260, "lng": -17.1381, "source": "wifi_hotspot"},
+        {"zone": "Zone VIP Ceremonie",       "cap": 1500,  "lat": 14.7263, "lng": -17.1377, "source": "wifi_hotspot"},
+        {"zone": "Entree Principale",        "cap": 5000,  "lat": 14.7256, "lng": -17.1385, "source": "iot_counter"},
+        {"zone": "Entree Secondaire",        "cap": 2500,  "lat": 14.7257, "lng": -17.1386, "source": "iot_counter"},
+        {"zone": "Parking",                  "cap": 3000,  "lat": 14.7254, "lng": -17.1388, "source": "orange_antenna"},
+    ],
+
+    "Centre des Expositions": [
+        # Sports : Escrime, Gym artistique, Judo, Taekwondo, Tennis de table, Wushu
+        {"zone": "Hall A - Escrime / Wushu",      "cap": 2000,  "lat": 14.7270, "lng": -17.1400, "source": "wifi_hotspot"},
+        {"zone": "Hall B - Judo / Taekwondo",     "cap": 2000,  "lat": 14.7272, "lng": -17.1398, "source": "wifi_hotspot"},
+        {"zone": "Hall C - Gym artistique",       "cap": 2500,  "lat": 14.7268, "lng": -17.1402, "source": "wifi_hotspot"},
+        {"zone": "Hall D - Tennis de table",      "cap": 1500,  "lat": 14.7274, "lng": -17.1396, "source": "wifi_hotspot"},
+        {"zone": "Tribune Centrale",              "cap": 3000,  "lat": 14.7271, "lng": -17.1400, "source": "orange_antenna"},
+        {"zone": "Entree Principale",             "cap": 2500,  "lat": 14.7266, "lng": -17.1404, "source": "iot_counter"},
+        {"zone": "Zone Accreditation",            "cap": 500,   "lat": 14.7265, "lng": -17.1405, "source": "iot_counter"},
+        {"zone": "Parking",                       "cap": 1800,  "lat": 14.7263, "lng": -17.1407, "source": "orange_antenna"},
+    ],
+
+    "Centre Equestre Gendarmerie": [
+        # Sports : Saut d'obstacles
+        {"zone": "Piste Principale",         "cap": 1000,  "lat": 14.7240, "lng": -17.1360, "source": "wifi_hotspot"},
+        {"zone": "Tribune Nord",             "cap": 1500,  "lat": 14.7242, "lng": -17.1358, "source": "orange_antenna"},
+        {"zone": "Tribune Sud",              "cap": 1500,  "lat": 14.7238, "lng": -17.1362, "source": "orange_antenna"},
+        {"zone": "Zone Paddock",             "cap": 400,   "lat": 14.7244, "lng": -17.1356, "source": "wifi_hotspot"},
+        {"zone": "Zone VIP",                 "cap": 300,   "lat": 14.7243, "lng": -17.1357, "source": "wifi_hotspot"},
+        {"zone": "Entree Principale",        "cap": 800,   "lat": 14.7236, "lng": -17.1364, "source": "iot_counter"},
+        {"zone": "Parking",                  "cap": 600,   "lat": 14.7234, "lng": -17.1366, "source": "orange_antenna"},
+    ],
+
+    # ── ZONE SALY ─────────────────────────────────────────────────────────────
+
     "Saly Beach West": [
-        {"zone": "Plage Principale",  "capacite": 8000, "lat": 14.4558, "lng": -17.0184},
-        {"zone": "Zone Compétition",  "capacite": 3000, "lat": 14.4544, "lng": -17.0193},
-        {"zone": "Zone Spectateurs",  "capacite": 5000, "lat": 14.4563, "lng": -17.0199},
-        {"zone": "Entrée Nord",       "capacite": 2000, "lat": 14.4574, "lng": -17.0190},
-        {"zone": "Entrée Sud",        "capacite": 2000, "lat": 14.4528, "lng": -17.0190},
-        {"zone": "Zone VIP",          "capacite":  500, "lat": 14.4550, "lng": -17.0176},
-        {"zone": "Zone Médias",       "capacite":  300, "lat": 14.4556, "lng": -17.0203},
-        {"zone": "Parking",           "capacite": 1000, "lat": 14.4538, "lng": -17.0212},
-    ],
-    "Gare Obélisque (BRT)": [
-        {"zone": "Porte A — Nord",    "capacite": 1200, "lat": 14.7053, "lng": -17.4640},
-        {"zone": "Porte B — Centre",  "capacite": 1200, "lat": 14.7045, "lng": -17.4640},
-        {"zone": "Porte C — Sud",     "capacite": 1200, "lat": 14.7037, "lng": -17.4640},
-        {"zone": "Quai Départ",       "capacite": 2000, "lat": 14.7045, "lng": -17.4630},
-        {"zone": "Quai Arrivée",      "capacite": 2000, "lat": 14.7045, "lng": -17.4650},
-        {"zone": "Hall Principal",    "capacite": 3000, "lat": 14.7049, "lng": -17.4637},
-        {"zone": "Zone Billetterie",  "capacite":  800, "lat": 14.7041, "lng": -17.4645},
-        {"zone": "Parking Relais",    "capacite":  800, "lat": 14.7031, "lng": -17.4650},
-    ],
-    "Gare Colobane (TER)": [
-        {"zone": "Quai 1 — Dakar",      "capacite": 1500, "lat": 14.7016, "lng": -17.4475},
-        {"zone": "Quai 2 — Diamniadio", "capacite": 1500, "lat": 14.7008, "lng": -17.4475},
-        {"zone": "Hall Accueil",        "capacite": 2500, "lat": 14.7012, "lng": -17.4485},
-        {"zone": "Zone Contrôle",       "capacite": 1000, "lat": 14.7017, "lng": -17.4489},
-        {"zone": "Sortie Principale",   "capacite":  800, "lat": 14.7007, "lng": -17.4491},
-        {"zone": "Sortie Secondaire",   "capacite":  500, "lat": 14.7019, "lng": -17.4469},
-        {"zone": "Zone Attente",        "capacite":  700, "lat": 14.7012, "lng": -17.4480},
-        {"zone": "Parking TER",         "capacite":  600, "lat": 14.7003, "lng": -17.4493},
+        # Sports : Beach Handball, Beach Volleyball, Beach Wrestling,
+        #          Aviron de mer, Voile, Triathlon
+        {"zone": "Plage Volleyball / Handball","cap": 5000, "lat": 14.4520, "lng": -16.9980, "source": "orange_antenna"},
+        {"zone": "Plage Triathlon / Aviron",   "cap": 3000, "lat": 14.4518, "lng": -16.9982, "source": "orange_antenna"},
+        {"zone": "Zone Voile - Embarcadere",   "cap": 1000, "lat": 14.4522, "lng": -16.9978, "source": "orange_antenna"},
+        {"zone": "Zone Spectateurs Plage",     "cap": 6000, "lat": 14.4516, "lng": -16.9984, "source": "orange_antenna"},
+        {"zone": "Zone VIP / Medias",          "cap": 500,  "lat": 14.4524, "lng": -16.9976, "source": "wifi_hotspot"},
+        {"zone": "Entree Nord",                "cap": 2000, "lat": 14.4526, "lng": -16.9975, "source": "iot_counter"},
+        {"zone": "Entree Sud",                 "cap": 2000, "lat": 14.4514, "lng": -16.9986, "source": "iot_counter"},
+        {"zone": "Parking",                    "cap": 1500, "lat": 14.4512, "lng": -16.9988, "source": "orange_antenna"},
     ],
 }
 
@@ -104,13 +129,15 @@ def get_heure_factor(heure):
     return factors.get(heure, 0.4)
 
 def get_zone_base(zone_name, heure_factor):
-    if any(x in zone_name for x in ['VIP', 'Médias', 'Billetterie']):
+    if any(x in zone_name for x in ['VIP', 'Medias', 'Medias', 'Billetterie', 'Accreditation', 'Paddock']):
         return heure_factor * 45
-    elif any(x in zone_name for x in ['Parking', 'Parking Relais', 'Parking TER']):
+    elif any(x in zone_name for x in ['Parking', 'Echauffement', 'Aire ']):
+        return heure_factor * 50
+    elif any(x in zone_name for x in ['Piste', 'Salle', 'Hall']):
         return heure_factor * 55
-    elif any(x in zone_name for x in ['Entrée', 'Porte', 'Quai', 'Sortie']):
+    elif any(x in zone_name for x in ['Entree', 'Entree', 'Porte', 'Quai', 'Sortie', 'Arrivee', 'Depart']):
         return heure_factor * 80
-    elif any(x in zone_name for x in ['Tribune', 'Secteur', 'Plage', 'Piscine']):
+    elif any(x in zone_name for x in ['Tribune', 'Secteur', 'Plage', 'Piscine', 'Spectateurs', 'Restauration']):
         return heure_factor * 70
     else:
         return heure_factor * 60
@@ -121,7 +148,7 @@ def compute_risk_score(densite, trend, heure, zone_name):
     elif trend == 'hausse': score += 8
     if heure in [9,10,14,15,18,19,20]: score += 10
     elif heure in [11,16]: score += 5
-    if 'Entrée' in zone_name or 'Porte' in zone_name: score += 10
+    if any(x in zone_name for x in ['Entree', 'Porte', 'Arrivee', 'Depart']): score += 10
     elif 'Quai' in zone_name: score += 8
     elif 'Parking' in zone_name: score += 3
     return min(100, score)
@@ -224,7 +251,7 @@ def refresh_data():
             if SCENARIO == 'montee':
                 base = min(95, get_zone_base(z["zone"], get_heure_factor(heure)) + 18)
                 densite = int(min(100, max(10, base + random.uniform(-5, 5))))
-            elif SCENARIO == 'critique' and any(x in z["zone"] for x in ['Entrée', 'Porte', 'Quai', 'Sortie']):
+            elif SCENARIO == 'critique' and any(x in z["zone"] for x in ['Entree', 'Porte', 'Quai', 'Sortie', 'Arrivee', 'Depart']):
                 densite = random.randint(88, 98)
             else:
                 base = get_zone_base(z["zone"], get_heure_factor(heure))
@@ -288,8 +315,8 @@ def refresh_data():
 
             result.append({
                 "zone":        z["zone"],
-                "capacite":    z["capacite"],
-                "personnes":   int(z["capacite"] * densite / 100),
+                "capacite":    z["cap"],
+                "personnes":   int(z["cap"] * densite / 100),
                 "densite":     densite,
                 "previous":    previous,
                 "delta":       delta,
@@ -303,13 +330,11 @@ def refresh_data():
                 "predicted_densite": predicted,
                 "alert_status":      alert_status,
                 "zone_id":     f"{lieu[:3].upper()}-{z['zone'][:3].upper()}-{str(i+1).zfill(2)}",
-                "source":      ("orange_antenna" if any(x in z["zone"] for x in ["Tribune", "Secteur", "Plage"])
-                                else "wifi_hotspot" if any(x in z["zone"] for x in ["Hall", "Billetterie", "VIP"])
-                                else "iot_counter"),
-                "lat": z.get("lat", 14.693),
-                "lng": z.get("lng", -17.447),
+                "source":      z.get("source", "iot_counter"),
+                "lat":         z.get("lat", 14.693),
+                "lng":         z.get("lng", -17.447),
             })
-        capacite_totale  = sum(zn["capacite"] for zn in zones)
+        capacite_totale  = sum(zn["cap"] for zn in zones)
         total_affluence  = sum(r["personnes"] for r in result)
         taux_remplissage = round(total_affluence / capacite_totale * 100, 1) if capacite_totale > 0 else 0.0
         for r in result:
@@ -324,7 +349,7 @@ def refresh_data():
 
 @app.route('/api/lieu')
 def get_lieu():
-    lieu = request.args.get('lieu', 'Stade LSS')
+    lieu = request.args.get('lieu', "Complexe Tour de l'Oeuf")
     try:
         with open("data.json", "r", encoding="utf-8") as f:
             data = json.load(f)
