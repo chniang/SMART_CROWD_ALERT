@@ -117,6 +117,30 @@ LIEUX = {
         {"zone": "Entree Sud",                 "cap": 2000, "lat": 14.4514, "lng": -16.9986, "source": "iot_counter"},
         {"zone": "Parking",                    "cap": 1500, "lat": 14.4512, "lng": -16.9988, "source": "orange_antenna"},
     ],
+
+    # ── TRANSPORT ─────────────────────────────────────────────────────────────
+
+    "Gare Obélisque (BRT)": [
+        {"zone": "Porte A — Nord",      "cap": 1200, "lat": 14.6967, "lng": -17.4441, "source": "iot_counter"},
+        {"zone": "Porte B — Centre",    "cap": 1200, "lat": 14.6966, "lng": -17.4442, "source": "iot_counter"},
+        {"zone": "Porte C — Sud",       "cap": 1200, "lat": 14.6965, "lng": -17.4443, "source": "iot_counter"},
+        {"zone": "Quai Départ",         "cap": 2000, "lat": 14.6968, "lng": -17.4440, "source": "orange_antenna"},
+        {"zone": "Quai Arrivée",        "cap": 2000, "lat": 14.6969, "lng": -17.4439, "source": "orange_antenna"},
+        {"zone": "Hall Principal",      "cap": 3000, "lat": 14.6970, "lng": -17.4438, "source": "wifi_hotspot"},
+        {"zone": "Zone Billetterie",    "cap": 800,  "lat": 14.6964, "lng": -17.4444, "source": "wifi_hotspot"},
+        {"zone": "Parking Relais",      "cap": 1000, "lat": 14.6963, "lng": -17.4445, "source": "orange_antenna"},
+    ],
+
+    "Gare Colobane (TER)": [
+        {"zone": "Quai 1 — Dakar",       "cap": 1500, "lat": 14.7072, "lng": -17.4558, "source": "iot_counter"},
+        {"zone": "Quai 2 — Diamniadio",  "cap": 1500, "lat": 14.7073, "lng": -17.4557, "source": "iot_counter"},
+        {"zone": "Hall Accueil",         "cap": 2500, "lat": 14.7074, "lng": -17.4556, "source": "wifi_hotspot"},
+        {"zone": "Zone Contrôle",        "cap": 1000, "lat": 14.7075, "lng": -17.4555, "source": "wifi_hotspot"},
+        {"zone": "Sortie Principale",    "cap": 800,  "lat": 14.7071, "lng": -17.4559, "source": "iot_counter"},
+        {"zone": "Sortie Secondaire",    "cap": 500,  "lat": 14.7070, "lng": -17.4560, "source": "iot_counter"},
+        {"zone": "Zone Attente",         "cap": 700,  "lat": 14.7076, "lng": -17.4554, "source": "orange_antenna"},
+        {"zone": "Parking TER",          "cap": 800,  "lat": 14.7069, "lng": -17.4561, "source": "orange_antenna"},
+    ],
 }
 
 SCENARIO = "normal"
