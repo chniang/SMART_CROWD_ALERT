@@ -45,12 +45,12 @@
     transition: width .25s ease;
     overflow: hidden;
   }
-  .sidebar.collapsed { width: 48px; }
+  .sidebar.collapsed { width: 52px; }
   .sidebar.collapsed .sb-logo-text,
   .sidebar.collapsed .sb-group,
   .sidebar.collapsed .sb-site-text,
   .sidebar.collapsed .sb-offline-ind { display: none; }
-  .sidebar.collapsed .sb-site { padding: 7px 8px; text-align: center; }
+  .sidebar.collapsed .sb-site { padding: 7px 8px; justify-content: center; }
   .sidebar.collapsed .sb-bottom { padding: 6px 4px; }
   .sidebar.collapsed .sb-toggle { transform: rotate(180deg); }
   .sb-toggle {
@@ -83,27 +83,28 @@
   .sb-nav::-webkit-scrollbar { width: 3px; }
   .sb-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
   .sb-group {
-    padding: 8px 14px 3px;
-    font-size: 9px; font-weight: 700; letter-spacing: 1px;
+    padding: 10px 14px 5px;
+    font-size: .62rem; font-weight: 800; letter-spacing: .18em;
     color: var(--muted); text-transform: uppercase;
   }
   .sb-site {
-    display: block; width: 100%;
-    padding: 7px 14px;
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 10px 14px;
     background: transparent;
     border: none; border-left: 2px solid transparent;
-    color: var(--muted); font-size: 12px; font-weight: 500;
+    color: var(--muted); font-size: .82rem; font-weight: 700;
     text-align: left; cursor: pointer;
     transition: all .15s;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; overflow: hidden;
     line-height: 1.3;
   }
+  .sb-icon { flex-shrink: 0; width: 20px; text-align: center; }
   .sb-site:hover { color: var(--text); background: rgba(255,255,255,.03); }
   .sb-site.active {
     border-left-color: var(--g);
     color: var(--g);
     background: rgba(0,240,160,.06);
-    font-weight: 600;
+    font-weight: 800; font-size: .85rem;
   }
   .sb-bottom {
     padding: 10px 12px; border-top: 1px solid var(--border);
@@ -264,6 +265,8 @@
   .zone-people { font-size: 10px; color: #4A7080; }
   .zone-trend  { font-size: 10px; font-weight: 600; margin-top: 2px; }
   .zone-reason { font-size: 9px; color: #4A7080; font-style: italic; margin-top: 2px; line-height: 1.3; }
+  .zone-predict { font-size: 9px; color: #4A8FA0; margin-top: 3px; font-style: italic; }
+  .zone-confirmed { font-size: 8px; font-weight: 700; letter-spacing: .06em; margin-top: 4px; color: #FF3D3D; background: rgba(255,61,61,.12); padding: 2px 6px; border-radius: 4px; display: inline-block; }
   .heatmap-legend {
     display: flex; gap: 14px; padding: 7px 12px;
     border-top: 1px solid #182832; background: #0D1A21;
@@ -334,16 +337,16 @@
 
   <nav class="sb-nav">
     <div class="sb-group">Stades</div>
-    <button class="sb-site active" data-site="Stade Abdoulaye Wade"    onclick="switchSite(this)"><span class="sb-site-text">Stade Abdoulaye Wade</span></button>
-    <button class="sb-site"        data-site="Dakar Arena"             onclick="switchSite(this)"><span class="sb-site-text">Dakar Arena</span></button>
-    <button class="sb-site"        data-site="Stade Iba Mar Diop"      onclick="switchSite(this)"><span class="sb-site-text">Stade Iba Mar Diop</span></button>
-    <button class="sb-site"        data-site="Corniche Ouest"          onclick="switchSite(this)"><span class="sb-site-text">Corniche Ouest</span></button>
-    <button class="sb-site"        data-site="Complexe Tour de l'Oeuf" onclick="switchSite(this)"><span class="sb-site-text">Complexe Tour de l'Oeuf</span></button>
-    <button class="sb-site"        data-site="Saly Beach West"         onclick="switchSite(this)"><span class="sb-site-text">Saly Beach West</span></button>
+    <button class="sb-site active" data-site="Stade Abdoulaye Wade"    onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Stade Abdoulaye Wade</span></button>
+    <button class="sb-site"        data-site="Dakar Arena"             onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Dakar Arena</span></button>
+    <button class="sb-site"        data-site="Stade Iba Mar Diop"      onclick="switchSite(this)"><span class="sb-icon">🏟</span><span class="sb-site-text"> Stade Iba Mar Diop</span></button>
+    <button class="sb-site"        data-site="Corniche Ouest"          onclick="switchSite(this)"><span class="sb-icon">🏖</span><span class="sb-site-text"> Corniche Ouest</span></button>
+    <button class="sb-site"        data-site="Complexe Tour de l'Oeuf" onclick="switchSite(this)"><span class="sb-icon">🏊</span><span class="sb-site-text"> Complexe Tour de l'Oeuf</span></button>
+    <button class="sb-site"        data-site="Saly Beach West"         onclick="switchSite(this)"><span class="sb-icon">🏖</span><span class="sb-site-text"> Saly Beach West</span></button>
 
     <div class="sb-group" style="margin-top:6px">Gares</div>
-    <button class="sb-site" data-site="Gare Obélisque (BRT)" onclick="switchSite(this)"><span class="sb-site-text">Gare Obélisque (BRT)</span></button>
-    <button class="sb-site" data-site="Gare Colobane (TER)"  onclick="switchSite(this)"><span class="sb-site-text">Gare Colobane (TER)</span></button>
+    <button class="sb-site" data-site="Gare Obélisque (BRT)" onclick="switchSite(this)"><span class="sb-icon">🚌</span><span class="sb-site-text"> Gare Obélisque (BRT)</span></button>
+    <button class="sb-site" data-site="Gare Colobane (TER)"  onclick="switchSite(this)"><span class="sb-icon">🚆</span><span class="sb-site-text"> Gare Colobane (TER)</span></button>
   </nav>
 
   <div class="sb-bottom">
@@ -503,7 +506,7 @@
     const sb = document.querySelector('.sidebar');
     sb.classList.toggle('collapsed');
     document.querySelector('.main-area').style.marginLeft =
-      sb.classList.contains('collapsed') ? '48px' : '220px';
+      sb.classList.contains('collapsed') ? '52px' : '220px';
   }
 
   // ── Scenario control ───────────────────────────────────────────────
@@ -745,6 +748,8 @@
           <div class="zone-people">${fmt(z.personnes)} / ${fmt(z.capacite)}</div>
           <div class="zone-trend" style="color:${trendCol(z.trend)}">${z.trend_icon || ''} ${z.trend_label || ''}</div>
           <div class="zone-reason">${z.risk_reason || ''}</div>
+          <div class="zone-predict">📈 Prédiction : ${z.predicted_densite !== undefined ? z.predicted_densite : z.densite}%</div>
+          ${z.alert_status === 'confirmée' ? '<div class="zone-confirmed">⚠ ALERTE CONFIRMÉE</div>' : z.alert_status === 'observation' ? '<div class="zone-confirmed" style="color:#FFBA00">👁 EN OBSERVATION</div>' : ''}
         </div>`;
     }).join('');
     document.getElementById('lastUpdate').textContent = 'MAJ ' + (data[0]?.time || '—');
@@ -829,6 +834,7 @@
         </div>
         <div class="alert-zone">${z.zone}</div>
         <div class="alert-msg">${z.risk_reason || ''}</div>
+        ${z.alert_status === 'confirmée' ? '<div style="font-size:.6rem;font-weight:700;color:#FF3D3D;margin-top:3px">⚠ ALERTE CONFIRMÉE — 3 cycles consécutifs</div>' : z.alert_status === 'observation' ? '<div style="font-size:.6rem;color:#FFBA00;margin-top:3px">👁 EN OBSERVATION</div>' : ''}
       </div>`).join('');
   }
 
