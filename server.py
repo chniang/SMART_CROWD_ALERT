@@ -7,6 +7,7 @@ import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from core.alerts import analyser_toutes_zones, generer_notifications
 from core.kpis import calculer_kpis
+from core.data_provider import get_densite
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
@@ -146,26 +147,6 @@ LIEUX = {
 SCENARIO = "normal"
 ZONE_HISTORY = {}
 
-def get_heure_factor(heure):
-    factors = {7: 0.3, 8: 0.3, 9: 0.7, 10: 0.7, 11: 0.65,
-               12: 0.55, 13: 0.55, 14: 0.8, 15: 0.8, 16: 0.75,
-               17: 0.7, 18: 0.9, 19: 0.9, 20: 0.85}
-    return factors.get(heure, 0.4)
-
-def get_zone_base(zone_name, heure_factor):
-    if any(x in zone_name for x in ['VIP', 'Medias', 'Medias', 'Billetterie', 'Accreditation', 'Paddock']):
-        return heure_factor * 45
-    elif any(x in zone_name for x in ['Parking', 'Echauffement', 'Aire ']):
-        return heure_factor * 50
-    elif any(x in zone_name for x in ['Piste', 'Salle', 'Hall']):
-        return heure_factor * 55
-    elif any(x in zone_name for x in ['Entree', 'Entree', 'Porte', 'Quai', 'Sortie', 'Arrivee', 'Depart']):
-        return heure_factor * 80
-    elif any(x in zone_name for x in ['Tribune', 'Secteur', 'Plage', 'Piscine', 'Spectateurs', 'Restauration']):
-        return heure_factor * 70
-    else:
-        return heure_factor * 60
-
 def compute_risk_score(densite, trend, heure, zone_name):
     score = densite
     if trend == 'hausse_rapide': score += 15
@@ -272,14 +253,7 @@ def refresh_data():
     for lieu, zones in LIEUX.items():
         result = []
         for i, z in enumerate(zones):
-            if SCENARIO == 'montee':
-                base = min(95, get_zone_base(z["zone"], get_heure_factor(heure)) + 18)
-                densite = int(min(100, max(10, base + random.uniform(-5, 5))))
-            elif SCENARIO == 'critique' and any(x in z["zone"] for x in ['Entree', 'Porte', 'Quai', 'Sortie', 'Arrivee', 'Depart']):
-                densite = random.randint(88, 98)
-            else:
-                base = get_zone_base(z["zone"], get_heure_factor(heure))
-                densite = int(min(100, max(5, base + random.uniform(-10, 10))))
+            densite = get_densite(z, SCENARIO, heure, prev_map.get(z["zone"], 50))
 
             previous = prev_map.get(z["zone"], densite)
             delta = densite - previous
