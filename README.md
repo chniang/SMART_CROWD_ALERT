@@ -7,6 +7,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.x-green?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Démo live](https://img.shields.io/badge/D%C3%A9mo%20live-Render-46E3B7?logo=render&logoColor=white)](https://smart-crowd-alert.onrender.com)
 [![GitHub](https://img.shields.io/badge/GitHub-chniang-181717?logo=github)](https://github.com/chniang/SMART_CROWD_ALERT)
 
 *Premier hackathon JOJ — SONATEL × Orange Digital Center Mermoz — Dakar 2026*
@@ -415,7 +416,7 @@ def get_zone_density(zone, heure):
 
 | Composant | État | Notes |
 |-----------|------|-------|
-| Dashboard web | ✅ Opérationnel | localhost:5000 |
+| Dashboard web | ✅ Opérationnel | [smart-crowd-alert.onrender.com](https://smart-crowd-alert.onrender.com) |
 | Backend Flask API | ✅ Opérationnel | 3 endpoints REST (`/api/refresh`, `/api/lieu`, `/api/scenario`) |
 | 10 sites JOJ officiels | ✅ Opérationnel | Zones réelles configurées |
 | Score de risque composite | ✅ Opérationnel | 4 facteurs : densité + tendance + heure + zone |
@@ -455,7 +456,7 @@ pip install -r requirements.txt
 python server.py
 ```
 
-Ouvrir : **http://localhost:5000**
+Ouvrir : **http://localhost:5000** — ou directement la démo live : **https://smart-crowd-alert.onrender.com**
 
 ### Démo en 30 secondes
 
