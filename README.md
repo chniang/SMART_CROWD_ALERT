@@ -129,15 +129,18 @@ pourquoi elle l'est, ce qu'elle va devenir, et quoi faire.
 SMART_CROWD_ALERT/
 ├── server.py              ← Point d'entrée Flask (port 5000)
 ├── dashboard.html         ← Interface web complète (HTML/CSS/JS)
-├── smart-crowd-app-v3.html← Maquette application mobile dynamique
+├── data.json              ← Cache temps réel (généré au premier démarrage)
 ├── requirements.txt       ← Dépendances Python
+├── Procfile               ← Configuration déploiement Render/Heroku
 ├── README.md
 ├── core/
+│   ├── data_provider.py   ← Abstraction sources de données (Orange/IoT/WiFi)
+│   ├── simulation.py      ← Simulation calibrée sur profils horaires
 │   ├── alerts.py          ← Logique de détection et alertes
 │   └── kpis.py            ← Calcul des KPIs
 └── data/
-    ├── simulate.py        ← Générateur de données simulées
-    └── joj_crowd_data.csv ← Dataset historique simulé
+    ├── simulate.py        ← Générateur du dataset de test
+    └── joj_crowd_data.csv ← Dataset de test (zones V1, non utilisé en prod)
 ```
 
 ### Endpoints API
