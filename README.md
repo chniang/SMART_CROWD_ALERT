@@ -7,7 +7,6 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.x-green?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
-[![Status](https://img.shields.io/badge/MVP-Fonctionnel-brightgreen)](http://localhost:5000)
 [![GitHub](https://img.shields.io/badge/GitHub-chniang-181717?logo=github)](https://github.com/chniang/SMART_CROWD_ALERT)
 
 *Premier hackathon JOJ — SONATEL × Orange Digital Center Mermoz — Dakar 2026*
