@@ -248,6 +248,10 @@ predicted = hist[-1] + slope
 
 ## 4. Fonctionnalités du dashboard
 
+### Vue d'ensemble — Scénario Critique
+
+![Dashboard Smart Crowd AI — 2 zones critiques détectées, alertes confirmées](assets/dashboard_preview.png)
+
 ### KPIs temps réel
 
 Quatre indicateurs en haut de l'interface, mis à jour à chaque cycle :
