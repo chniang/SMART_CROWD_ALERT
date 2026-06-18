@@ -416,14 +416,14 @@ def get_zone_density(zone, heure):
 | Composant | État | Notes |
 |-----------|------|-------|
 | Dashboard web | ✅ Opérationnel | localhost:5000 |
-| Backend Flask API | ✅ Opérationnel | 4 endpoints REST |
+| Backend Flask API | ✅ Opérationnel | 3 endpoints REST (`/api/refresh`, `/api/lieu`, `/api/scenario`) |
 | 10 sites JOJ officiels | ✅ Opérationnel | Zones réelles configurées |
 | Score de risque composite | ✅ Opérationnel | 4 facteurs : densité + tendance + heure + zone |
 | Alertes avec confirmation | ✅ Opérationnel | Anti faux-positifs 3 cycles |
 | Prédiction de trajectoire | ✅ Opérationnel | Régression linéaire sur 5 points |
 | Mode offline | ✅ Opérationnel | Cache localStorage par site |
 | 3 scénarios de démo | ✅ Opérationnel | Normal / Montée / Critique |
-| Maquette app mobile | ✅ Dynamique | HTML — non connectée au backend |
+| Maquette app mobile | ❌ Non incluse | Fichier retiré du repo — vision décrite en section 5 |
 
 ### Ce qui n'est pas encore implémenté
 
