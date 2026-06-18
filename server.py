@@ -1,18 +1,12 @@
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
-import pandas as pd
-import numpy as np
 import json
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from core.alerts import analyser_toutes_zones, generer_notifications
-from core.kpis import calculer_kpis
 from core.data_provider import get_densite
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
-
-df_base = pd.read_csv("data/joj_crowd_data.csv")
 
 LIEUX = {
 
@@ -162,58 +156,6 @@ def compute_risk_score(densite, trend, heure, zone_name):
 def index():
     return send_from_directory('.', 'dashboard.html')
 
-@app.route('/api/jours')
-def get_jours():
-    return jsonify(sorted(df_base['jour'].unique().tolist()))
-
-@app.route('/api/heures')
-def get_heures():
-    return jsonify(sorted(df_base['heure'].unique().tolist()))
-
-@app.route('/api/data')
-def get_data():
-    jour = request.args.get('jour', df_base['jour'].max())
-    heure = int(request.args.get('heure', 14))
-    live = request.args.get('live', 'false') == 'true'
-
-    snap = df_base[(df_base['jour']==jour) & (df_base['heure']==heure)].copy()
-
-    if live:
-        bruit = np.random.uniform(-0.06, 0.10, size=len(snap))
-        snap['taux_occupation'] = (snap['taux_occupation'] + bruit).clip(0.05, 1.10)
-        snap['affluence'] = (snap['taux_occupation'] * snap['capacite']).astype(int)
-
-    da = analyser_toutes_zones(snap)
-    kpis = calculer_kpis(da)
-    notifs = generer_notifications(da)
-
-    return jsonify({
-        'kpis': {
-            'zones_critiques': int(kpis['zones_critiques']),
-            'zones_elevees':   int(kpis['zones_elevees']),
-            'taux_occupation_moyen': float(kpis['taux_occupation_moyen']),
-            'score_global':    float(kpis['score_global']),
-            'zone_plus_chargee': kpis['zone_plus_chargee'],
-            'taux_zone_max':   float(kpis['taux_zone_max']),
-            'niveau_global':   kpis['niveau_global'],
-        },
-        'alertes': notifs,
-        'zones': da[['zone','taux_occupation','statut','score_menace',
-                     'affluence','capacite','couleur_hex','message','action']].to_dict('records'),
-    })
-
-@app.route('/api/evolution')
-def get_evolution():
-    jour = request.args.get('jour', df_base['jour'].max())
-    zone = request.args.get('zone', '')
-    dz = df_base[(df_base['jour']==jour) & (df_base['zone']==zone)].sort_values('heure')
-    taux = (dz['taux_occupation'] * 100).round(1).tolist()
-    statuts = ['critique' if t >= 85 else 'eleve' if t >= 60 else 'normal' for t in taux]
-    return jsonify({
-        'heures':  dz['heure'].tolist(),
-        'taux':    taux,
-        'statuts': statuts,
-    })
 
 @app.route('/api/scenario')
 def set_scenario():
