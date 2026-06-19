@@ -251,7 +251,11 @@ predicted = hist[-1] + slope
 
 ### Vue d'ensemble — Scénario Critique
 
+**Desktop**
 ![Dashboard Smart Crowd AI — 2 zones critiques détectées, alertes confirmées](assets/dashboard_preview.png)
+
+**Mobile (390px) — sidebar drawer, KPIs empilés**
+![Dashboard Smart Crowd AI — vue mobile responsive, scénario critique](assets/dashboard_mobile.png)
 
 ### KPIs temps réel
 
