@@ -10,7 +10,7 @@
 [![Démo live](https://img.shields.io/badge/D%C3%A9mo%20live-Render-46E3B7?logo=render&logoColor=white)](https://smart-crowd-alert.onrender.com)
 [![GitHub](https://img.shields.io/badge/GitHub-chniang-181717?logo=github)](https://github.com/chniang/SMART_CROWD_ALERT)
 
-*Premier hackathon JOJ — SONATEL × Orange Digital Center Mermoz — Dakar 2026*
+*Projet initié lors du Hackathon JOJ Innovation Challenge (SONATEL × Orange Digital Center Mermoz, avril 2026), poursuivi en développement personnel.*
 
 </div>
 
@@ -56,11 +56,12 @@ pourquoi elle l'est, ce qu'elle va devenir, et quoi faire.
 4. [Fonctionnalités du dashboard](#4-fonctionnalités-du-dashboard)
 5. [Application mobile terrain](#5-application-mobile-terrain)
 6. [Sources de données](#6-sources-de-données)
-7. [État du MVP](#7-état-du-mvp)
-8. [Installation et démarrage](#8-installation-et-démarrage)
-9. [Déploiement production](#9-déploiement-production)
-10. [Limites actuelles](#10-limites-actuelles)
-11. [Perspectives et roadmap](#11-perspectives-et-roadmap)
+7. [Prédiction par Machine Learning](#7-prédiction-par-machine-learning)
+8. [État du MVP](#8-état-du-mvp)
+9. [Installation et démarrage](#9-installation-et-démarrage)
+10. [Déploiement production](#10-déploiement-production)
+11. [Limites actuelles](#11-limites-actuelles)
+12. [Perspectives et roadmap](#12-perspectives-et-roadmap)
 
 ---
 
@@ -116,10 +117,10 @@ pourquoi elle l'est, ce qu'elle va devenir, et quoi faire.
 │  Compteurs IoT   │  /api/lieu?lieu=X        │  App Mobile 📱        │
 │  WiFi indoor     │  /api/scenario?mode=X    │                       │
 │  Billetterie     │                          │                       │
-│                  │  ZONE_HISTORY (5 pts)    │  localStorage cache   │
+│                  │  ZONE_HISTORY (10 pts)   │  localStorage cache   │
 │  ↕ MVP :         │  compute_risk_score()    │  (mode offline)       │
-│  simulation      │  get_heure_factor()      │                       │
-│  calibrée        │  get_zone_base()         │                       │
+│  simulation      │  predict_densite()       │                       │
+│  calibrée        │  (LSTM numpy, zéro TF)   │                       │
 └──────────────────┴──────────────────────────┴───────────────────────┘
 ```
 
@@ -129,18 +130,21 @@ pourquoi elle l'est, ce qu'elle va devenir, et quoi faire.
 SMART_CROWD_ALERT/
 ├── server.py              ← Point d'entrée Flask (port 5000)
 ├── dashboard.html         ← Interface web complète (HTML/CSS/JS)
-├── data.json              ← Cache temps réel (généré au premier démarrage)
-├── requirements.txt       ← Dépendances Python
-├── Procfile               ← Configuration déploiement Render/Heroku
+├── data.json              ← Cache temps réel (+ persistance ZONE_HISTORY)
+├── requirements.txt       ← flask, flask-cors, gunicorn, numpy
+├── Procfile               ← Configuration déploiement Render
 ├── README.md
 ├── core/
-│   ├── data_provider.py   ← Abstraction sources de données (Orange/IoT/WiFi)
-│   ├── simulation.py      ← Simulation calibrée sur profils horaires
-│   ├── alerts.py          ← Logique de détection et alertes
-│   └── kpis.py            ← Calcul des KPIs
-└── data/
-    ├── simulate.py        ← Générateur du dataset de test
-    └── joj_crowd_data.csv ← Dataset de test (zones V1, non utilisé en prod)
+│   ├── data_provider.py        ← Abstraction sources (Orange/IoT/WiFi)
+│   ├── simulation.py           ← Simulation calibrée sur profils horaires
+│   ├── historical_generator.py ← Générateur historique 30 jours (ML)
+│   ├── prediction.py           ← Inférence LSTM numpy pure
+│   └── models/                 ← Poids LSTM exportés (~93 KB)
+├── notebook/
+│   └── prediction_densite.ipynb ← EDA + entraînement LSTM
+└── assets/
+    ├── dashboard_preview.png
+    └── dashboard_mobile.png
 ```
 
 ### Endpoints API
@@ -162,15 +166,12 @@ SMART_CROWD_ALERT/
   "densite": 87,
   "trend": "hausse_rapide",
   "trend_label": "hausse rapide",
+  "trend_icon": "⬆⬆",
   "status": "danger",
   "risk_score": 100,
-  "risk_reason": "Densite 87% + hausse rapide — risque critique",
+  "risk_reason": "Densité 87% + hausse rapide — risque critique",
   "predicted_densite": 91.4,
-  "alert_status": "confirmee",
-  "zone_id": "SAW-TRI-01",
-  "source": "orange_antenna",
-  "lat": 14.7260,
-  "lng": -17.1380,
+  "alert_status": "confirmée",
   "taux_remplissage_site": 71.2,
   "time": "18:05:14"
 }
@@ -230,12 +231,10 @@ Cela évite les faux positifs qui épuisent la vigilance des agents.
 
 ### Prédiction de trajectoire
 
-```python
-# Regression lineaire sur les 5 dernières mesures
-# Permet d'anticiper la densité du prochain cycle
-slope     = sum((i - x_mean) * (h - y_mean) for i, h in enumerate(hist)) / denom
-predicted = hist[-1] + slope
-```
+La densité du prochain cycle est prédite par un modèle LSTM entraîné sur 115 200 points
+historiques simulés. Après 10 cycles de collecte (environ 50 secondes en mode LIVE),
+le modèle prend le relais de la régression linéaire initiale.
+Voir [Section 7 — Prédiction par Machine Learning](#7-prédiction-par-machine-learning).
 
 ### Scénarios de démonstration
 
@@ -278,7 +277,7 @@ Chaque zone-card affiche en temps réel :
 - Personnes présentes sur capacité maximale
 - Tendance avec icônes (⬆⬆ / ⬆ / → / ⬇ / ⬇⬇)
 - Message contextuel en langage naturel généré automatiquement
-- Prédiction pour le prochain cycle
+- Prédiction pour le prochain cycle (LSTM après 10 cycles, régression linéaire avant)
 - Badge EN OBSERVATION ou ALERTE CONFIRMÉE si applicable
 
 ### Système d'alertes
@@ -393,28 +392,122 @@ Capteurs aux tourniquets comptant les flux entrants et sortants.
 | Usage | Capacité maximale autorisée et attendance attendue par zone |
 | Dans le MVP | Capacités fixes intégrées dans le dictionnaire `LIEUX` |
 
-### Intégration Orange — ce que ça change concrètement
+### Interface d'abstraction — le vrai code
+
+L'architecture source-agnostique repose sur `core/data_provider.py`.
+Pour connecter l'API Orange : une seule fonction à implémenter, rien d'autre ne change.
 
 ```python
-# Aujourd'hui (MVP) :
-def get_zone_density(zone, heure):
-    return simulate_density(zone, heure)   # simulation calibrée
+# core/data_provider.py — interface réelle en production
 
-# Production — meme architecture, source differente :
-def get_zone_density(zone, heure):
-    r = requests.get(
-        f"https://api.orange.com/network-analytics/v1/cells/{zone['antenna_id']}",
-        headers={"Authorization": f"Bearer {ORANGE_API_KEY}"}
-    )
-    return r.json()["device_count"] / zone["cap"] * 100
-    # L'architecture Flask, les alertes, le dashboard : rien ne change
+def get_densite(zone_config: dict, scenario: str, heure: int, previous: float) -> int:
+    """
+    Point d'entrée unique. Dispatche selon zone_config["source"].
+    """
+    source = zone_config.get("source", "simulation")
+
+    if source == "orange_antenna":
+        return _fetch_orange_antenna(zone_config, scenario, heure)
+    elif source == "iot_counter":
+        return _fetch_iot_counter(zone_config, scenario, heure)
+    elif source == "wifi_hotspot":
+        return _fetch_wifi_hotspot(zone_config, scenario, heure)
+    else:
+        return _simulate(zone_config, scenario, heure)
+
+
+def _fetch_orange_antenna(zone_config: dict, scenario: str, heure: int) -> int:
+    """
+    TODO V2 : Appel API Orange Network Analytics
+    Endpoint cible : GET /network-analytics/crowd-density
+
+    Exemple futur :
+        response = requests.get(
+            ORANGE_API_URL,
+            params={"lat": zone_config["lat"], "lng": zone_config["lng"]},
+            headers={"Authorization": f"Bearer {ORANGE_API_KEY}"}
+        )
+        return response.json()["density_percent"]
+    """
+    return _simulate(zone_config, scenario, heure)   # MVP : simulation
 ```
 
-**L'architecture reste identique. On remplace l'endpoint. C'est l'objet de la prochaine étape avec Sonatel.**
+**L'architecture Flask, les alertes, le dashboard : rien ne change quand on branche les vraies données.**
 
 ---
 
-## 7. État du MVP
+## 7. Prédiction par Machine Learning
+
+### Pipeline complet
+
+```
+core/historical_generator.py
+  ↓ génère 115 200 points (80 zones × 30 jours × 48 pts/jour)
+  ↓ facteurs : profil horaire, weekend +20%, jours de compétition +45%
+
+notebook/prediction_densite.ipynb
+  ↓ EDA : distribution des densités, séries temporelles, jours d'événement
+  ↓ Entraînement LSTM(32) → Dense(1) sur 91 360 séquences (80% train)
+  ↓ Comparaison baseline régression linéaire (identique au calcul serveur)
+  ↓ Export poids numpy dans core/models/
+
+core/prediction.py
+  ↓ Inférence LSTM en pur numpy — zéro TensorFlow en production
+  ↓ predict_densite(historique) → float
+  ↓ Fallback régression linéaire si historique < 10 points
+```
+
+### Résultats
+
+Entraîné sur 115 200 points simulés (30 jours, 80 zones), évalué sur 23 040 séquences de test.
+
+| Modèle | MAE (%) | RMSE (%) |
+|--------|--------:|--------:|
+| Régression linéaire (baseline) | 6.79 | 9.77 |
+| LSTM 32 units | **5.88** | **8.08** |
+| Gain | **-13.4%** | **-17.3%** |
+
+Le gain est modeste mais honnête — cohérent avec la nature périodique et régulière
+des données simulées. La régression linéaire est déjà un bon prédicteur sur des séries lisses.
+
+### Inférence sans TensorFlow en production
+
+Les poids sont exportés en `.npy` (~93 KB au total) et le forward pass est réimplémenté
+en numpy pur dans `core/prediction.py`. Render n'installe pas TensorFlow (~500 MB) :
+seul `numpy` est requis.
+
+```python
+# core/prediction.py — passe avant LSTM en numpy pur
+for x_t in seq_norm:
+    x = np.array([[x_t]], dtype=np.float32)
+    z = x @ W + h @ U + b                    # (1, 4·units)
+    i = _sig(z[:, 0*units:1*units])           # input gate
+    f = _sig(z[:, 1*units:2*units])           # forget gate
+    g = np.tanh(z[:, 2*units:3*units])        # cell gate
+    o = _sig(z[:, 3*units:4*units])           # output gate
+    c = f * c + i * g
+    h = o * np.tanh(c)
+out_norm = (h @ Wd + bd).item()              # .item() : compatibilité numpy strict
+```
+
+### Rigueur d'ingénierie — un exemple concret
+
+En production (Render, numpy récent), `float(array_2D)` lève `TypeError` alors que
+la même ligne fonctionnait en local (numpy permissif). Diagnostic via un endpoint de
+debug temporaire, correction en une ligne : `.item()` est shape-agnostique.
+
+Ce type d'écart de comportement entre versions est documenté — c'est précisément
+pour ça qu'on teste en production, pas seulement en local.
+
+### Explorer le notebook
+
+[`notebook/prediction_densite.ipynb`](notebook/prediction_densite.ipynb) —
+EDA complet, courbes d'apprentissage, comparaison visuelle LSTM vs baseline,
+export des poids.
+
+---
+
+## 8. État du MVP
 
 ### Ce qui est opérationnel aujourd'hui
 
@@ -425,7 +518,8 @@ def get_zone_density(zone, heure):
 | 10 sites JOJ officiels | ✅ Opérationnel | Zones réelles configurées |
 | Score de risque composite | ✅ Opérationnel | 4 facteurs : densité + tendance + heure + zone |
 | Alertes avec confirmation | ✅ Opérationnel | Anti faux-positifs 3 cycles |
-| Prédiction de trajectoire | ✅ Opérationnel | Régression linéaire sur 5 points |
+| Prédiction LSTM | ✅ Opérationnel | LSTM 32 units en numpy pur, MAE 5.88% |
+| Persistance ZONE_HISTORY | ✅ Opérationnel | Survit aux spin-downs Render via data.json |
 | Mode offline | ✅ Opérationnel | Cache localStorage par site |
 | 3 scénarios de démo | ✅ Opérationnel | Normal / Montée / Critique |
 | Maquette app mobile | ❌ Non incluse | Fichier retiré du repo — vision décrite en section 5 |
@@ -439,12 +533,12 @@ def get_zone_density(zone, heure):
 | Application mobile native | Haute | V2 |
 | Carte géographique Leaflet | Moyenne | V2 |
 | Authentification agents | Moyenne | V2 |
-| ML supervisé sur historiques | Haute | V3 |
+| Entraînement ML sur données réelles | Haute | V2+ |
 | Analyse comportementale caméras | Basse | V3 |
 
 ---
 
-## 8. Installation et démarrage
+## 9. Installation et démarrage
 
 ### Prérequis
 
@@ -478,48 +572,65 @@ ngrok http 5000
 
 ---
 
-## 9. Déploiement production
+## 10. Déploiement production
 
-> Les éléments ci-dessous décrivent la vision architecture production.
-> Ils ne sont pas encore implémentés dans le MVP.
+### Déploiement Render (actuel)
 
-### Docker — portabilité
+Le projet est déployé en continu sur **Render Web Service free tier** via GitHub.
 
-```dockerfile
-# Exemple conceptuel — non déployé dans le MVP actuel
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 5000
-CMD ["python", "server.py"]
+**URL publique :** [https://smart-crowd-alert.onrender.com](https://smart-crowd-alert.onrender.com)
+
+```
+# Procfile
+web: gunicorn server:app --bind 0.0.0.0:$PORT --workers 1
 ```
 
-### Kubernetes — scalabilité
+```
+# requirements.txt
+flask
+flask-cors
+gunicorn
+numpy
+```
 
-Notre charge production estimée : 10 sites × 8 zones × 1 refresh/5s ≈ 16 messages/seconde.
-Flask gère 100+ req/s sans problème pour cette charge.
-Kubernetes devient nécessaire pour l'ingestion haute fréquence des données capteurs
-et pour garantir la haute disponibilité pendant les JOJ (SLA 99.9%).
+**Note `--workers 1` :** Render free tier alloue 512 MB de RAM. Gunicorn lance par
+défaut `2 × CPU + 1 = 3` workers. Avec numpy (~100 MB par worker), la limite mémoire
+est dépassée dès que le LSTM s'active. Un seul worker suffit pour un usage portfolio —
+et évite l'OOM sans réduire les fonctionnalités.
+
+### Contraintes free tier
+
+| Contrainte | Impact | Comportement observé |
+|------------|--------|----------------------|
+| Spin-down après 15 min d'inactivité | Cold start ~20s au premier accès | Normal — ZONE_HISTORY persiste via data.json |
+| 512 MB RAM | Limite workers gunicorn | Résolu avec `--workers 1` |
+| Disque éphémère | data.json perdu au redémarrage complet | ZONE_HISTORY restauré depuis le fichier au démarrage |
+
+### Déploiement local alternatif
+
+```bash
+# Identique à Render en local
+gunicorn server:app --bind 0.0.0.0:5000 --workers 1
+```
 
 ---
 
-## 10. Limites actuelles
+## 11. Limites actuelles
 
 ### Données et précision
 
 | Limite | Impact | Mitigation |
 |--------|--------|------------|
-| Données 100% simulées | Ne reflète pas la réalité terrain | Simulation calibrée sur patterns réels |
-| Pas d'historique réel | Modèle ML impossible à entraîner | Architecture prête pour intégration |
+| Données temps réel 100% simulées | Ne reflète pas la réalité terrain | Simulation calibrée sur patterns réels — architecture prête pour vraies données |
+| Données ML 100% simulées | Le LSTM apprend sur la simulation, pas sur des incidents réels | Gain mesuré honnêtement sur données simulées — à ré-entraîner sur historiques réels en V2 |
+| Pas d'historique réel | Modèle ML non validé en conditions opérationnelles | Architecture prête pour intégration |
 | Précision antenne insuffisante par zone | Ne distingue pas Tribune Nord/Sud | Complémentarité IoT aux entrées |
 
 ### Architecture et sécurité
 
 | Limite | Vision production |
 |--------|------------------|
-| Flask mono-thread | FastAPI avec support asynchrone natif |
+| Flask mono-worker (free tier) | FastAPI avec support asynchrone natif + scaling horizontal |
 | data.json comme cache | Redis ou TimescaleDB |
 | Pas d'authentification | JWT + rôles agents (coordinateur / terrain) |
 | Pas de persistance historique | TimescaleDB pour séries temporelles |
@@ -534,27 +645,27 @@ et pour garantir la haute disponibilité pendant les JOJ (SLA 99.9%).
 
 ---
 
-## 11. Perspectives et roadmap
+## 12. Perspectives et roadmap
 
 ```
 V1 — MVP (disponible aujourd'hui)
 ├── Dashboard web opérationnel
 ├── 10 sites JOJ officiels avec zones réelles
-├── Score composite + alertes confirmées + prédiction
+├── Score composite + alertes confirmées
+├── Prédiction LSTM numpy (MAE 5.88%, zéro TF en prod)
 ├── Mode offline + 3 scénarios de démo
 └── Simulation calibrée sur profils horaires réels
 
-V2 — Intégration données réelles (prochain jalon — avec Sonatel)
+V2 — Intégration données réelles (prochain jalon)
 ├── Connexion API Orange Network Analytics
 │   → Remplacement de la simulation par les vraies données antennes
 ├── Alertes SMS Sonatel réelles vers les agents et spectateurs
 ├── Carte Leaflet interactive avec positionnement GPS par zone
 ├── Application mobile React Native native
-└── Authentification agents JOJ (login + rôles)
+├── Authentification agents JOJ (login + rôles)
+└── Ré-entraînement ML sur historiques réels d'affluence
 
 V3 — Intelligence augmentée (6 mois)
-├── ML supervisé entraîné sur historiques d'incidents réels
-│   → Modèle de classification Random Forest / LSTM
 ├── Analyse comportementale par caméra (YOLOv8) pour zones indoor
 ├── Intégration billetterie JOJ officielle (capacité nominative)
 ├── Prédiction 30 minutes à l'avance (vs 1 cycle actuellement)
@@ -588,10 +699,9 @@ Smart Crowd AI adresse un marché non couvert, avec une approche :
 
 ## Équipe
 
-Projet développé lors du Hackathon JOJ Innovation Challenge
-organisé par **SONATEL** × **Orange Digital Center Mermoz** — Dakar 2026.
-
-Accompagnement post-hackathon en cours avec Sonatel.
+Projet initié lors du **Hackathon JOJ Innovation Challenge**
+organisé par **SONATEL** × **Orange Digital Center Mermoz** (avril 2026),
+poursuivi en développement personnel comme projet portfolio.
 
 **GitHub :** [github.com/chniang/SMART_CROWD_ALERT](https://github.com/chniang/SMART_CROWD_ALERT)
 
