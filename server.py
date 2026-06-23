@@ -182,7 +182,9 @@ def refresh_data():
             prev_raw = json.load(f)
         prev_map = {}
         if isinstance(prev_raw, dict):
-            for zones in prev_raw.values():
+            for key, zones in prev_raw.items():
+                if key.startswith("_"):
+                    continue
                 for z in zones:
                     prev_map[z["zone"]] = z["densite"]
         else:
@@ -275,6 +277,7 @@ def refresh_data():
             r["taux_remplissage_site"] = taux_remplissage
         all_results[lieu] = result
 
+    all_results["_history"] = ZONE_HISTORY
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(all_results, f, ensure_ascii=False, indent=2)
 
@@ -292,7 +295,15 @@ def get_lieu():
         return jsonify([])
 
 import os as _os
-if not _os.path.exists("data.json"):
+if _os.path.exists("data.json"):
+    try:
+        with open("data.json", "r", encoding="utf-8") as _f:
+            _saved = json.load(_f)
+        if isinstance(_saved.get("_history"), dict):
+            ZONE_HISTORY.update(_saved["_history"])
+    except Exception:
+        pass
+else:
     with app.test_client() as c:
         c.get('/api/refresh')
 
