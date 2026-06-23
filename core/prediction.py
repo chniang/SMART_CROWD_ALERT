@@ -71,7 +71,7 @@ def _forward(seq_norm):
         c = f * c + i * g
         h = o * np.tanh(c)
 
-    out_norm = float(h @ Wd + bd)
+    out_norm = (h @ Wd + bd).item()
     return out_norm * (dmax - dmin) + dmin
 
 # ── Interface publique ────────────────────────────────────────────────────────

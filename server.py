@@ -240,12 +240,7 @@ def refresh_data():
                 ZONE_HISTORY[key].pop(0)
 
             hist = ZONE_HISTORY[key]
-            try:
-                lstm_pred = predict_densite(hist)
-            except Exception as _e:
-                import traceback as _tb
-                app.logger.error(f"predict_densite error: {_tb.format_exc()}")
-                lstm_pred = None
+            lstm_pred = predict_densite(hist)
             if lstm_pred is not None:
                 predicted = lstm_pred
             elif len(hist) >= 3:
@@ -302,24 +297,6 @@ def get_lieu():
         return jsonify(zones)
     except Exception:
         return jsonify([])
-
-@app.route('/api/debug/lstm')
-def debug_lstm():
-    import traceback as _tb
-    from core.prediction import model_available, predict_densite, _M
-    info = {'model_available': model_available()}
-    if _M:
-        info['shapes'] = {k: list(v.shape) for k, v in _M.items() if hasattr(v, 'shape')}
-        info['scaler'] = {k: v for k, v in _M.items() if not hasattr(v, 'shape')}
-    try:
-        pred = predict_densite([40.0] * 10)
-        info['test_prediction'] = pred
-        info['status'] = 'ok'
-    except Exception as e:
-        info['error'] = str(e)
-        info['traceback'] = _tb.format_exc()
-        info['status'] = 'error'
-    return jsonify(info)
 
 import os as _os
 if _os.path.exists("data.json"):
