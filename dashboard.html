@@ -358,7 +358,35 @@
     .topbar-sc-group { display: none !important; }
     .topbar-clock { font-size: 11px; padding: 3px 7px; letter-spacing: 0; }
   }
+
+  /* ── MAP ─────────────────────────────────────────────────────────── */
+  #map-panel { padding: 14px; height: calc(100vh - 50px); display: none; }
+  #leaflet-map { height: 100%; border-radius: 10px; overflow: hidden; }
+  .map-label {
+    background: rgba(6,13,18,.92) !important;
+    border: 1px solid #182832 !important;
+    color: #ECF4F8 !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    white-space: nowrap;
+  }
+  .map-label::before { display: none !important; }
+  .leaflet-popup-content-wrapper {
+    background: #0D1A21; border: 1px solid #182832; border-radius: 10px;
+    color: #ECF4F8; box-shadow: 0 4px 20px rgba(0,0,0,.5);
+  }
+  .leaflet-popup-tip { background: #0D1A21; }
+  .leaflet-popup-close-button { color: #4A7080 !important; }
+  .leaflet-control-zoom a { background: #0D1A21 !important; color: #ECF4F8 !important; border-color: #182832 !important; }
+  .leaflet-control-zoom a:hover { background: #112330 !important; }
+  .leaflet-control-attribution { background: rgba(6,13,18,.8) !important; color: #4A7080 !important; }
+  .leaflet-control-attribution a { color: #4A7080 !important; }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
 
@@ -413,6 +441,7 @@
       <button onclick="setScenario('montee')"   id="sc-montee"   style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,186,0,.4);background:rgba(255,186,0,.08);color:#FFBA00;cursor:pointer;font-family:inherit">Montée</button>
       <button onclick="setScenario('critique')" id="sc-critique" style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid rgba(255,61,61,.4);background:rgba(255,61,61,.08);color:#FF3D3D;cursor:pointer;font-family:inherit">Critique</button>
     </div>
+    <button onclick="toggleMap()" id="mapBtn" title="Carte interactive" style="font-size:.62rem;padding:4px 10px;border-radius:8px;border:1px solid #182832;background:#0D1A21;color:#4A7080;cursor:pointer;font-family:inherit;font-weight:700;opacity:.65;transition:opacity .2s,background .2s,border-color .2s">🗺 Carte</button>
     <div class="topbar-clock" id="clock">--:--:--</div>
     <div class="topbar-level" id="topbarLevel">—</div>
   </header>
@@ -531,6 +560,12 @@
     </div>
 
   </div><!-- /content -->
+
+  <!-- MAP PANEL -->
+  <div id="map-panel">
+    <div id="leaflet-map"></div>
+  </div>
+
 </div><!-- /main-area -->
 
 <script>
@@ -658,14 +693,14 @@
       const all = await res.json();
       for (const [site, zones] of Object.entries(all)) saveCache(site, zones);
       const data = all[currentSite];
-      if (data && data.length) { updateUI(data); goOnline(); return; }
+      if (data && data.length) { updateUI(data); goOnline(); if (mapVisible) refreshMap(); return; }
     } catch(e) {}
     // fallback /api/lieu
     try {
       const res2 = await fetch('/api/lieu?lieu=' + encodeURIComponent(currentSite));
       if (!res2.ok) throw new Error();
       const data2 = await res2.json();
-      if (data2 && data2.length) { saveCache(currentSite, data2); updateUI(data2); goOnline(); return; }
+      if (data2 && data2.length) { saveCache(currentSite, data2); updateUI(data2); goOnline(); if (mapVisible) refreshMap(); return; }
     } catch(e) {}
     // final fallback: localStorage
     const cached = loadCache(currentSite);
@@ -933,6 +968,91 @@
     if (!el) return;
     const taux = data[0]?.taux_remplissage_site;
     el.textContent = taux != null ? 'Capacité : ' + taux + '%' : '—';
+  }
+
+  // ── Map ────────────────────────────────────────────────────────────
+  let mapInstance = null;
+  let mapMarkers  = {};
+  let mapFitted   = false;
+  let mapVisible  = false;
+
+  const MAP_CLR = { danger: '#FF3D3D', modere: '#FFBA00', fluide: '#00F0A0' };
+
+  function toggleMap() {
+    mapVisible = !mapVisible;
+    const content  = document.querySelector('.content');
+    const mapPanel = document.getElementById('map-panel');
+    const btn      = document.getElementById('mapBtn');
+
+    if (mapVisible) {
+      content.style.display  = 'none';
+      mapPanel.style.display = 'block';
+      btn.style.opacity      = '1';
+      btn.style.background   = 'rgba(0,240,160,.12)';
+      btn.style.borderColor  = 'rgba(0,240,160,.4)';
+      btn.style.color        = 'var(--g)';
+
+      if (!mapInstance) {
+        mapInstance = L.map('leaflet-map', { center: [14.6928, -17.4467], zoom: 9 });
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors', maxZoom: 18,
+        }).addTo(mapInstance);
+      }
+      mapInstance.invalidateSize();
+      refreshMap();
+    } else {
+      content.style.display  = '';
+      mapPanel.style.display = 'none';
+      btn.style.opacity      = '.65';
+      btn.style.background   = '#0D1A21';
+      btn.style.borderColor  = '#182832';
+      btn.style.color        = '#4A7080';
+    }
+  }
+
+  async function refreshMap() {
+    if (!mapInstance) return;
+    try {
+      const res = await fetch('/api/carte');
+      if (!res.ok) return;
+      const sites = await res.json();
+
+      const bounds = [];
+      sites.forEach(site => {
+        const color  = MAP_CLR[site.status] || '#4A7080';
+        const ll     = [site.lat, site.lng];
+        bounds.push(ll);
+
+        const popup = `<div style="font-family:'Segoe UI',system-ui,sans-serif;min-width:190px;line-height:1.4">
+          <div style="font-weight:700;font-size:13px;margin-bottom:6px;color:#ECF4F8">${site.lieu}</div>
+          <div style="font-size:22px;font-weight:800;color:${color}">${site.taux_remplissage}%</div>
+          <div style="font-size:10px;color:#888;margin-bottom:8px">taux de remplissage</div>
+          <div style="display:flex;gap:10px;font-size:11px">
+            <span style="color:#FF3D3D">⚠ ${site.zones_danger}</span>
+            <span style="color:#FFBA00">◈ ${site.zones_modere}</span>
+            <span style="color:#00F0A0">✓ ${site.zones_fluide}</span>
+          </div>
+        </div>`;
+
+        if (mapMarkers[site.lieu]) {
+          mapMarkers[site.lieu].setStyle({ fillColor: color });
+          mapMarkers[site.lieu].getPopup().setContent(popup);
+        } else {
+          const m = L.circleMarker(ll, {
+            radius: 13, color: '#060D12', weight: 2,
+            fillColor: color, fillOpacity: 0.88,
+          }).addTo(mapInstance);
+          m.bindPopup(popup, { maxWidth: 260 });
+          m.bindTooltip(site.lieu, { direction: 'top', offset: [0, -14], className: 'map-label' });
+          mapMarkers[site.lieu] = m;
+        }
+      });
+
+      if (!mapFitted && bounds.length > 1) {
+        mapInstance.fitBounds(bounds, { padding: [50, 50] });
+        mapFitted = true;
+      }
+    } catch(e) {}
   }
 
   // Boot

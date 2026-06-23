@@ -287,6 +287,41 @@ def refresh_data():
 
     return jsonify(all_results)
 
+@app.route('/api/carte')
+def carte():
+    coords = {}
+    for lieu, zones in LIEUX.items():
+        lats = [z['lat'] for z in zones]
+        lngs = [z['lng'] for z in zones]
+        coords[lieu] = (sum(lats) / len(lats), sum(lngs) / len(lngs))
+
+    try:
+        with open('data.json', 'r', encoding='utf-8') as f:
+            saved = json.load(f)
+    except Exception:
+        saved = {}
+
+    result = []
+    for lieu, (lat, lng) in coords.items():
+        zones = [z for z in saved.get(lieu, []) if isinstance(z, dict)]
+        n_d = sum(1 for z in zones if z.get('status') == 'danger')
+        n_m = sum(1 for z in zones if z.get('status') == 'modere')
+        n_f = sum(1 for z in zones if z.get('status') == 'fluide')
+        status = 'danger' if n_d else ('modere' if n_m else 'fluide')
+        taux = round(zones[0].get('taux_remplissage_site', 0), 1) if zones else 0
+        result.append({
+            'lieu':             lieu,
+            'lat':              round(lat, 5),
+            'lng':              round(lng, 5),
+            'status':           status,
+            'taux_remplissage': taux,
+            'zones_danger':     n_d,
+            'zones_modere':     n_m,
+            'zones_fluide':     n_f,
+            'total_zones':      len(LIEUX[lieu]),
+        })
+    return jsonify(result)
+
 @app.route('/api/lieu')
 def get_lieu():
     lieu = request.args.get('lieu', "Complexe Tour de l'Oeuf")
