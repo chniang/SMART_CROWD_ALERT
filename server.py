@@ -4,6 +4,7 @@ import json
 import sys, os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from core.data_provider import get_densite
+from core.prediction import predict_densite
 
 app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
@@ -235,11 +236,14 @@ def refresh_data():
             if key not in ZONE_HISTORY:
                 ZONE_HISTORY[key] = []
             ZONE_HISTORY[key].append(densite)
-            if len(ZONE_HISTORY[key]) > 5:
+            if len(ZONE_HISTORY[key]) > 10:
                 ZONE_HISTORY[key].pop(0)
 
             hist = ZONE_HISTORY[key]
-            if len(hist) >= 3:
+            lstm_pred = predict_densite(hist)
+            if lstm_pred is not None:
+                predicted = lstm_pred
+            elif len(hist) >= 3:
                 n = len(hist)
                 x_mean = (n - 1) / 2
                 y_mean = sum(hist) / n

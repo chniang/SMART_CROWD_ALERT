@@ -7,3 +7,6 @@ __pycache__/
 venv/
 data.json
 server_log.txt
+data/historique_simule.csv
+_train.py
+_train_log.txt
