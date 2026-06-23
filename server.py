@@ -194,7 +194,7 @@ def refresh_data():
     all_results = {}
     for lieu, zones in LIEUX.items():
         result = []
-        for i, z in enumerate(zones):
+        for z in zones:
             densite = get_densite(z, SCENARIO, heure, prev_map.get(z["zone"], 50))
 
             previous = prev_map.get(z["zone"], densite)
@@ -258,8 +258,6 @@ def refresh_data():
                 "capacite":    z["cap"],
                 "personnes":   int(z["cap"] * densite / 100),
                 "densite":     densite,
-                "previous":    previous,
-                "delta":       delta,
                 "trend":       trend,
                 "trend_icon":  trend_icon,
                 "trend_label": trend_label,
@@ -269,16 +267,11 @@ def refresh_data():
                 "time":        now,
                 "predicted_densite": predicted,
                 "alert_status":      alert_status,
-                "zone_id":     f"{lieu[:3].upper()}-{z['zone'][:3].upper()}-{str(i+1).zfill(2)}",
-                "source":      z.get("source", "iot_counter"),
-                "lat":         z.get("lat", 14.693),
-                "lng":         z.get("lng", -17.447),
             })
         capacite_totale  = sum(zn["cap"] for zn in zones)
         total_affluence  = sum(r["personnes"] for r in result)
         taux_remplissage = round(total_affluence / capacite_totale * 100, 1) if capacite_totale > 0 else 0.0
         for r in result:
-            r["capacite_totale_site"]  = capacite_totale
             r["taux_remplissage_site"] = taux_remplissage
         all_results[lieu] = result
 
