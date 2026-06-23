@@ -9,6 +9,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.x-green?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![Démo live](https://img.shields.io/badge/D%C3%A9mo%20live-Render-46E3B7?logo=render&logoColor=white)](https://smart-crowd-alert.onrender.com)
 [![GitHub](https://img.shields.io/badge/GitHub-chniang-181717?logo=github)](https://github.com/chniang/SMART_CROWD_ALERT)
+[![Tests](https://github.com/chniang/SMART_CROWD_ALERT/actions/workflows/tests.yml/badge.svg)](https://github.com/chniang/SMART_CROWD_ALERT/actions/workflows/tests.yml)
 
 *Projet initié lors du Hackathon JOJ Innovation Challenge (SONATEL × Orange Digital Center Mermoz, avril 2026), poursuivi en développement personnel.*
 
